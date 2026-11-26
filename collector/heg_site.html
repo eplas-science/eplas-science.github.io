@@ -446,12 +446,16 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
   .meet { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
   .meet .logo { width: 40px; height: 40px; }
 }
+/* ---- funding ---- */
+.fund .fsum { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.due { font-size: 12.5px; font-weight: 600; white-space: nowrap; color: var(--warm); }
+.due.hot { color: #dc2626; }
 </style>
 
 <header class="top"><div class="wrap">
   <div class="brand"><h1><span>EPLAS</span></h1><small>Earth &amp; planetary science · news, research papers, jobs and conferences</small></div>
   <nav class="tabs" aria-label="Sections">
-    <a href="#today">Today</a><a href="#branches">Branches</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a><a href="#conferences">Conferences</a><a href="#community">Community</a>
+    <a href="#today">Today</a><a href="#branches">Branches</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a><a href="#funding">Funding</a><a href="#conferences">Conferences</a><a href="#community">Community</a>
   </nav>
 </div></header>
 <div class="ticker" aria-label="Latest headlines"><div class="wrap"><span class="tag">Live</span><div class="window"><div class="track" id="ticker"></div></div></div></div>
@@ -513,8 +517,8 @@ const FAM = Object.fromEntries(FAMILIES.map((f) => [f.id, f]));
 THEMES.forEach((t) => { t.color = FAM[t.family].color; });
 const TH = Object.fromEntries(THEMES.map((t) => [t.id, t]));
 
-let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, MEET = { items: [], tba: [] }, COMM = { items: [], categories: [] }, CAT = {};
-const S = { q: "", cat: null, theme: null, days: 45, mine: false, cfield: null, mfield: null, mregion: "All", jq: "", jlevel: "All", jsector: "All", jskills: new Set(), jsort: "fit", savedOnly: false,
+let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, MEET = { items: [], tba: [] }, COMM = { items: [], categories: [] }, FUND = { items: [] }, CAT = {};
+const S = { q: "", cat: null, theme: null, days: 45, mine: false, fq: "", ftype: "All", fstage: "All", fagency: "All", fsort: "deadline", cfield: null, mfield: null, mregion: "All", jq: "", jlevel: "All", jsector: "All", jskills: new Set(), jsort: "fit", savedOnly: false,
   mineThemes: new Set(store.get("branches", THEMES.map((t) => t.id)).filter((id) => THEMES.some((t) => t.id === id))), saved: new Set(store.get("saved", [])) };
 if (!S.mineThemes.size) S.mineThemes = new Set(THEMES.map((t) => t.id));
 
@@ -551,6 +555,8 @@ const ICONS = {
   planetary: '<circle cx="12" cy="12" r="5"/><ellipse cx="12" cy="12" rx="10" ry="3" transform="rotate(-22 12 12)"/>',
   applied: '<path d="M3 12h3.5L9 6l4 12 2.5-6H21"/>',
   climate: '<path d="M10 14.5V5a2 2 0 1 1 4 0v9.5a4 4 0 1 1-4 0z"/><path d="M12 9v7"/>',
+  coin: '<circle cx="12" cy="12" r="8.5"/><path d="M14.6 9.3c-.5-.8-1.4-1.3-2.6-1.3-1.5 0-2.5.8-2.5 1.9 0 2.6 5.1 1.4 5.1 4.2 0 1.1-1.1 1.9-2.6 1.9-1.2 0-2.2-.5-2.7-1.4M12 6.5V8M12 16v1.5"/>',
+  award: '<circle cx="12" cy="9" r="5.5"/><path d="M8.8 13.5L7.5 21l4.5-2.5 4.5 2.5-1.3-7.5"/>',
 };
 const ic = (name, size = 18) => `<svg class="ic" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.spark}</svg>`;
 
@@ -813,6 +819,59 @@ function viewConferences() {
     </div></div>`;
 }
 
+/* ---------- funding ---------- */
+const AGENCIES = [[/^NSF/, "NSF", "nsf"], [/^NASA/, "NASA", "nasa"], [/NOAA/, "NOAA", ""], [/USGS/, "USGS", "usgs"], [/^DOE|^PAMS/, "DOE", "doe"],
+  [/^EPA/, "EPA", "epa"], [/BOR$|-BOR/, "Reclamation", "usbr"], [/NPS/, "NPS", ""], [/FWS/, "FWS", "fws"], [/^DOD/, "Defense", ""], [/^DOC/, "Commerce", ""]];
+const agencyOf = (f) => { const a = AGENCIES.find(([rx]) => rx.test(f.agencyCode || "")); return a ? { short: a[1], logo: a[2] } : { short: "Other", logo: "" }; };
+const F_TYPES = ["Grant", "Fellowship", "Scholarship", "Prize & challenge", "Training & REU", "Cooperative agreement"];
+const F_STAGES = ["Students", "Postdocs", "Early career", "Researchers & institutions"];
+const daysTo = (iso) => Math.round((utc(iso) - utc(todayISO())) / DAY);
+const fundOk = (f, skip) => (skip === "type" || S.ftype === "All" || f.type === S.ftype) && (skip === "stage" || S.fstage === "All" || f.stage === S.fstage)
+  && (skip === "agency" || S.fagency === "All" || agencyOf(f).short === S.fagency) && (skip === "theme" || !S.theme || inTheme(f, S.theme))
+  && (!S.fq || `${f.title} ${f.agency} ${f.summary} ${f.number}`.toLowerCase().includes(S.fq.toLowerCase()));
+const money = (v) => (+v > 1 ? `Up to $${Number(v).toLocaleString("en-US")}` : "");
+function fundRow(f) {
+  const a = agencyOf(f), d = f.deadline ? daysTo(f.deadline) : null;
+  const due = f.rolling ? '<span class="soon">Open any time</span>' : d <= 14 ? `<span class="due hot">${d <= 0 ? "Due today" : d === 1 ? "Due tomorrow" : `Due in ${d} days`}</span>` : `<span class="soon">in ${d < 60 ? `${d} days` : `${Math.round(d / 30.4)} months`}</span>`;
+  return `<article class="meet fund">${logo({ logo: a.logo, short: a.short })}
+    <div class="mbody"><div class="mtop"><h3><a href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${esc(f.title)}</a></h3>${due}</div>
+      <div class="who">${esc(f.agency)}${f.number ? ` · ${esc(f.number)}` : ""}</div>
+      <div class="meta"><span class="mi">${ic("cal", 14)}${f.deadline ? `Deadline ${esc(fmt(f.deadline, { day: "numeric", month: "short", year: "numeric" }))}` : "No fixed deadline"}</span>${money(f.ceiling) ? `<span class="mi">${ic("coin", 14)}${money(f.ceiling)}</span>` : ""}<span class="pill soft">${esc(f.type)}</span><span class="pill soft">${esc(f.stage)}</span>${f.status === "forecasted" ? '<span class="pill warn" title="Announced ahead of time; details may change">Forecast</span>' : ""}</div>
+      ${f.summary ? `<p class="fsum">${esc(f.summary)}</p>` : ""}
+      <div class="mfoot"><div class="fdots">${famDots(familiesOf(f))}</div><div class="mlinks"><a href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${ic("ext", 14)}Details on Grants.gov</a>${f.deadline ? `<button data-fics="${esc(f.id)}">${ic("cal", 14)}Add deadline to calendar</button>` : ""}</div></div>
+    </div></article>`;
+}
+function viewFunding() {
+  const all = FUND.items || [];
+  let list = all.filter((f) => fundOk(f));
+  const count = (skip, test) => all.filter((f) => fundOk(f, skip) && test(f)).length;
+  const types = F_TYPES.filter((t) => all.some((f) => f.type === t));
+  const agencies = [...new Set(all.map((f) => agencyOf(f).short))].sort((x, y) => count("agency", (f) => agencyOf(f).short === y) - count("agency", (f) => agencyOf(f).short === x));
+  const opt = (key, value, label, n) => `<button class="opt" data-${key}="${esc(value)}" aria-pressed="${S[key] === value}"><span>${esc(label)}</span><span class="n">${n}</span></button>`;
+  let body;
+  if (S.fsort === "new") {
+    list = list.sort((x, y) => (y.firstSeen || "").localeCompare(x.firstSeen || ""));
+    body = list.map(fundRow).join("");
+  } else {
+    const soon = list.filter((f) => !f.rolling && daysTo(f.deadline) <= 30), later = list.filter((f) => !f.rolling && daysTo(f.deadline) > 30), open = list.filter((f) => f.rolling);
+    body = [["Closing in the next 30 days", soon], ["Later deadlines", later], ["Open any time", open]].filter(([, l]) => l.length)
+      .map(([h, l]) => `<section class="month"><h3>${h}</h3>${l.map(fundRow).join("")}</section>`).join("");
+  }
+  const awards = NEWS.items.filter((i) => i.category === "awards").slice(0, 6);
+  return `<div class="layout"><aside class="filters" aria-label="Funding filters">
+      <div><h4>Type</h4>${opt("ftype", "All", "All types", count("type", () => true))}${types.map((t) => opt("ftype", t, t, count("type", (f) => f.type === t))).join("")}</div>
+      <div><h4>Who it's for</h4>${opt("fstage", "All", "Everyone", count("stage", () => true))}${F_STAGES.map((t) => opt("fstage", t, t, count("stage", (f) => f.stage === t))).join("")}</div>
+      <div><h4>Field</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All fields</span></button>${FAMILIES.map((fm) => `<button class="opt" data-theme="fam:${fm.id}" aria-pressed="${S.theme === `fam:${fm.id}`}"><span><i style="background:${fm.color}"></i>${esc(fm.label)}</span><span class="n">${count("theme", (f) => familiesOf(f).includes(fm.id))}</span></button>`).join("")}</div>
+      <div><h4>Agency</h4>${opt("fagency", "All", "All agencies", count("agency", () => true))}${agencies.map((t) => opt("fagency", t, t, count("agency", (f) => agencyOf(f).short === t))).join("")}</div>
+      <div><h4>Sort</h4>${opt("fsort", "deadline", "Deadline first", "")}${opt("fsort", "new", "Newest first", "")}</div>
+    </aside><div>
+    <div class="toolbar"><label class="search"><input id="fq" type="search" placeholder="Search funding: hydrology, Mars, postdoc, NSF…" value="${esc(S.fq)}" aria-label="Search funding"></label><span class="count">${list.length} open</span></div>
+    ${body || `<p class="empty">${all.length ? "Nothing matches. Try another type, stage, field or agency." : "Funding opportunities appear here after the next update."}</p>`}
+    ${awards.length ? `<section class="month"><h3>Awards &amp; prizes in the news</h3><div class="list">${awards.map(row).join("")}</div></section>` : ""}
+    <p class="note">U.S. federal opportunities from Grants.gov (NSF, NASA, NOAA, USGS, DOE, EPA and others), refreshed twice a day. Always check eligibility and the deadline on the official page before applying.</p>
+    </div></div>`;
+}
+
 /* ---------- community ---------- */
 const FORUM = "https://github.com/eplas-science/eplas-science.github.io/discussions";
 const ROOMS = [...FAMILIES.map((f) => ({ label: f.label, color: f.color, about: f.blurb, icon: f.id })),
@@ -875,12 +934,12 @@ function editThemes() {
 }
 
 /* ---------- render + routing ---------- */
-const route = () => (["today", "branches", "news", "papers", "jobs", "conferences", "community"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
+const route = () => (["today", "branches", "news", "papers", "jobs", "funding", "conferences", "community"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
 function render() {
   const r = route(), view = $("#view");
   const keep = document.activeElement?.id, pos = document.activeElement?.selectionStart;
   document.querySelectorAll("nav.tabs a").forEach((a) => a.setAttribute("aria-current", a.getAttribute("href") === `#${r}` ? "page" : "false"));
-  view.innerHTML = !NEWS.items.length && !["jobs", "conferences", "community"].includes(r) ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "conferences" ? viewConferences() : r === "community" ? viewCommunity() : r === "branches" ? viewBranches() : viewToday();
+  view.innerHTML = !NEWS.items.length && !["jobs", "funding", "conferences", "community"].includes(r) ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "conferences" ? viewConferences() : r === "community" ? viewCommunity() : r === "funding" ? viewFunding() : r === "branches" ? viewBranches() : viewToday();
   paint(view);
   if (keep && document.getElementById(keep)) { const el = document.getElementById(keep); el.focus(); if (pos != null && el.setSelectionRange) el.setSelectionRange(pos, pos); }
 }
@@ -907,6 +966,11 @@ document.addEventListener("click", (e) => {
   else if (d.gotoTheme) { S.theme = d.gotoTheme; S.cat = null; }
   else if (d.editThemes !== undefined) editThemes();
   else if (d.cfield !== undefined) { S.cfield = d.cfield || null; render(); }
+  else if (d.ftype) { S.ftype = d.ftype; render(); }
+  else if (d.fstage) { S.fstage = d.fstage; render(); }
+  else if (d.fagency) { S.fagency = d.fagency; render(); }
+  else if (d.fsort) { S.fsort = d.fsort; render(); }
+  else if (d.fics) { const f = FUND.items.find((x) => String(x.id) === d.fics); if (f) saveIcs([{ id: `grant-${f.id}`, name: `Deadline: ${f.title}`, org: f.agency, url: f.link, start: f.deadline, end: f.deadline }], `deadline-${f.id}.ics`); }
   else if (d.mfield !== undefined) { S.mfield = d.mfield || null; render(); }
   else if (d.mregion) { S.mregion = d.mregion; render(); }
   else if (d.ics) { const m = MEET.items.find((x) => x.id === d.ics); if (m) saveIcs([m], `${m.id}.ics`); }
@@ -923,6 +987,7 @@ document.addEventListener("click", (e) => {
 document.addEventListener("input", (e) => {
   if (e.target.id === "q") { S.q = e.target.value; clearTimeout(S.t); S.t = setTimeout(render, 160); }
   if (e.target.id === "jq") { S.jq = e.target.value; clearTimeout(S.t); S.t = setTimeout(render, 160); }
+  if (e.target.id === "fq") { S.fq = e.target.value; clearTimeout(S.t); S.t = setTimeout(render, 160); }
 });
 window.addEventListener("hashchange", () => { render(); window.scrollTo({ top: 0 }); });
 
@@ -931,6 +996,7 @@ async function boot() {
   JOBS = embedded("jobs-data") || await fetch("jobs.json").then((r) => r.json()).catch(() => JOBS);
   MEET = await fetch("conferences.json").then((r) => (r.ok ? r.json() : MEET)).catch(() => MEET);
   COMM = await fetch("community.json").then((r) => (r.ok ? r.json() : COMM)).catch(() => COMM);
+  FUND = await fetch("funding.json").then((r) => (r.ok ? r.json() : FUND)).catch(() => FUND);
   CAT = Object.fromEntries((NEWS.categories || []).map((c) => [c.id, c]));
   ticker(); footer(); render();
 }

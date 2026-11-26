@@ -29,10 +29,13 @@ jobs:
           base="https://${{ github.repository_owner }}.github.io"   # an <owner>.github.io repository is served at the root
           curl -fsSL "$base/news.json" -o site/news.json || rm -f site/news.json
           curl -fsSL "$base/jobs.json" -o site/jobs.json || rm -f site/jobs.json
+          curl -fsSL "$base/funding.json" -o site/funding.json || rm -f site/funding.json
       - name: Collect news, papers and jobs
         run: python collector/news_collector.py site collector/heg_site.html
       - name: Make the site readable for search engines (headlines, robots.txt, sitemap)
         run: python collector/seo.py site
+      - name: Open funding opportunities (Grants.gov)
+        run: python collector/funding.py site
       - name: Newest community threads (GitHub Discussions)
         run: python collector/community.py site
         env:

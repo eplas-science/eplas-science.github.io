@@ -23,6 +23,10 @@ SITES = {  # key -> organiser home page
     "iugg": "https://iugg.org/", "esa": "https://esa.org/", "seg": "https://seg.org/", "gsa": "https://www.geosociety.org/",
     "canvas": "https://www.sciencesocieties.org/", "iugs": "https://www.iugs.org/", "eegs": "https://www.eegs.org/",
     "dps": "https://dps.aas.org/", "aogs": "https://www.asiaoceania.org/", "aeg": "https://www.aegweb.org/",
+    # funding agencies
+    "nsf": "https://www.nsf.gov/", "nasa": "https://www.nasa.gov/", "noaa": "https://www.noaa.gov/", "usgs": "https://www.usgs.gov/",
+    "doe": "https://www.energy.gov/", "epa": "https://www.epa.gov/", "usbr": "https://www.usbr.gov/", "nps": "https://www.nps.gov/",
+    "fws": "https://www.fws.gov/",
 }
 LINK = re.compile(r"<link\b[^>]*>", re.I)
 
@@ -75,7 +79,10 @@ def save(key, home):
 
 if __name__ == "__main__":
     OUT.mkdir(exist_ok=True)
+    only = set(sys.argv[1:])  # optional: just these keys
     for key, home in SITES.items():
+        if only and key not in only:
+            continue
         try:
             print(save(key, home))
         except Exception as error:
