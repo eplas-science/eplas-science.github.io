@@ -450,6 +450,8 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
 .fund .fsum { margin: 6px 0 0; font-size: 13.5px; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .due { font-size: 12.5px; font-weight: 600; white-space: nowrap; color: var(--warm); }
 .due.hot { color: #dc2626; }
+.soon.quiet { color: var(--faint); font-weight: 500; }
+.fund .cycle { margin-top: 4px; font-size: 12.5px; color: var(--faint); }
 </style>
 
 <header class="top"><div class="wrap">
@@ -517,7 +519,7 @@ const FAM = Object.fromEntries(FAMILIES.map((f) => [f.id, f]));
 THEMES.forEach((t) => { t.color = FAM[t.family].color; });
 const TH = Object.fromEntries(THEMES.map((t) => [t.id, t]));
 
-let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, MEET = { items: [], tba: [] }, COMM = { items: [], categories: [] }, FUND = { items: [] }, CAT = {};
+let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, MEET = { items: [], tba: [] }, COMM = { items: [], categories: [] }, FUND = { items: [] }, OPP = { items: [] }, CAT = {};
 const S = { q: "", cat: null, theme: null, days: 45, mine: false, fq: "", ftype: "All", fstage: "All", fagency: "All", fsort: "deadline", cfield: null, mfield: null, mregion: "All", jq: "", jlevel: "All", jsector: "All", jskills: new Set(), jsort: "fit", savedOnly: false,
   mineThemes: new Set(store.get("branches", THEMES.map((t) => t.id)).filter((id) => THEMES.some((t) => t.id === id))), saved: new Set(store.get("saved", [])) };
 if (!S.mineThemes.size) S.mineThemes = new Set(THEMES.map((t) => t.id));
@@ -822,27 +824,40 @@ function viewConferences() {
 /* ---------- funding ---------- */
 const AGENCIES = [[/^NSF/, "NSF", "nsf"], [/^NASA/, "NASA", "nasa"], [/NOAA/, "NOAA", ""], [/USGS/, "USGS", "usgs"], [/^DOE|^PAMS/, "DOE", "doe"],
   [/^EPA/, "EPA", "epa"], [/BOR$|-BOR/, "Reclamation", "usbr"], [/NPS/, "NPS", ""], [/FWS/, "FWS", "fws"], [/^DOD/, "Defense", ""], [/^DOC/, "Commerce", ""]];
-const agencyOf = (f) => { const a = AGENCIES.find(([rx]) => rx.test(f.agencyCode || "")); return a ? { short: a[1], logo: a[2] } : { short: "Other", logo: "" }; };
-const F_TYPES = ["Grant", "Fellowship", "Scholarship", "Prize & challenge", "Training & REU", "Cooperative agreement"];
-const F_STAGES = ["Students", "Postdocs", "Early career", "Researchers & institutions"];
+const agencyOf = (f) => { if (f.rec) return { short: f.short, logo: f.logoKey }; const a = AGENCIES.find(([rx]) => rx.test(f.agencyCode || "")); return a ? { short: a[1], logo: a[2] } : { short: "Other", logo: "" }; };
+const F_TYPES = ["Grant", "Fellowship", "Scholarship", "Award", "Prize & challenge", "Training & REU", "Cooperative agreement"];
+const F_STAGES = ["Students", "Postdocs", "Early career", "Researchers & institutions", "All career stages"];
+const famsOf = (f) => f.fields || familiesOf(f);
+const fundInTheme = (f, v) => (f.fields && v.startsWith("fam:") ? f.fields.includes(v.slice(4)) : inTheme(f, v));
+/* Hand-kept recurring opportunities, shaped like the Grants.gov items. */
+function recurring() {
+  const t = todayISO();
+  return (OPP.items || []).map((o) => {
+    const upcoming = o.deadline && o.deadline >= t;
+    return { id: `r-${o.id}`, rec: true, title: o.name, agency: o.org, short: o.short, logoKey: o.logo || "", agencyCode: "", deadline: upcoming ? o.deadline : "",
+      rolling: false, waiting: !upcoming, expected: upcoming ? "" : o.expected || (o.deadline ? `Last deadline ${fmt(o.deadline, { day: "numeric", month: "short", year: "numeric" })}` : "Next round not announced"),
+      type: o.type, stage: o.stage, link: o.url, summary: o.note || "", amount: o.amount || "", ceiling: "", check: o.check, cycle: o.cycle || "", fields: o.fields, firstSeen: OPP.checked || "" };
+  });
+}
 const daysTo = (iso) => Math.round((utc(iso) - utc(todayISO())) / DAY);
 const fundOk = (f, skip) => (skip === "type" || S.ftype === "All" || f.type === S.ftype) && (skip === "stage" || S.fstage === "All" || f.stage === S.fstage)
-  && (skip === "agency" || S.fagency === "All" || agencyOf(f).short === S.fagency) && (skip === "theme" || !S.theme || inTheme(f, S.theme))
+  && (skip === "agency" || S.fagency === "All" || agencyOf(f).short === S.fagency) && (skip === "theme" || !S.theme || fundInTheme(f, S.theme))
   && (!S.fq || `${f.title} ${f.agency} ${f.summary} ${f.number}`.toLowerCase().includes(S.fq.toLowerCase()));
 const money = (v) => (+v > 1 ? `Up to $${Number(v).toLocaleString("en-US")}` : "");
 function fundRow(f) {
   const a = agencyOf(f), d = f.deadline ? daysTo(f.deadline) : null;
-  const due = f.rolling ? '<span class="soon">Open any time</span>' : d <= 14 ? `<span class="due hot">${d <= 0 ? "Due today" : d === 1 ? "Due tomorrow" : `Due in ${d} days`}</span>` : `<span class="soon">in ${d < 60 ? `${d} days` : `${Math.round(d / 30.4)} months`}</span>`;
+  const due = f.waiting ? '<span class="soon quiet">Recurring</span>' : f.rolling ? '<span class="soon">Open any time</span>' : d <= 14 ? `<span class="due hot">${d <= 0 ? "Due today" : d === 1 ? "Due tomorrow" : `Due in ${d} days`}</span>` : `<span class="soon">in ${d < 60 ? `${d} days` : `${Math.round(d / 30.4)} months`}</span>`;
   return `<article class="meet fund">${logo({ logo: a.logo, short: a.short })}
     <div class="mbody"><div class="mtop"><h3><a href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${esc(f.title)}</a></h3>${due}</div>
       <div class="who">${esc(f.agency)}${f.number ? ` · ${esc(f.number)}` : ""}</div>
-      <div class="meta"><span class="mi">${ic("cal", 14)}${f.deadline ? `Deadline ${esc(fmt(f.deadline, { day: "numeric", month: "short", year: "numeric" }))}` : "No fixed deadline"}</span>${money(f.ceiling) ? `<span class="mi">${ic("coin", 14)}${money(f.ceiling)}</span>` : ""}<span class="pill soft">${esc(f.type)}</span><span class="pill soft">${esc(f.stage)}</span>${f.status === "forecasted" ? '<span class="pill warn" title="Announced ahead of time; details may change">Forecast</span>' : ""}</div>
+      <div class="meta"><span class="mi">${ic("cal", 14)}${f.deadline ? `Deadline ${esc(fmt(f.deadline, { day: "numeric", month: "short", year: "numeric" }))}` : f.waiting ? esc(f.expected) : "No fixed deadline"}</span>${money(f.ceiling) || f.amount ? `<span class="mi">${ic("coin", 14)}${esc(money(f.ceiling) || f.amount)}</span>` : ""}<span class="pill soft">${esc(f.type)}</span><span class="pill soft">${esc(f.stage)}</span>${f.status === "forecasted" ? '<span class="pill warn" title="Announced ahead of time; details may change">Forecast</span>' : ""}${f.check ? '<span class="pill warn" title="Dates come from listings or past rounds. Confirm on the official page.">Check dates</span>' : ""}</div>
+      ${f.cycle ? `<div class="cycle">${esc(f.cycle)}</div>` : ""}
       ${f.summary ? `<p class="fsum">${esc(f.summary)}</p>` : ""}
-      <div class="mfoot"><div class="fdots">${famDots(familiesOf(f))}</div><div class="mlinks"><a href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${ic("ext", 14)}Details on Grants.gov</a>${f.deadline ? `<button data-fics="${esc(f.id)}">${ic("cal", 14)}Add deadline to calendar</button>` : ""}</div></div>
+      <div class="mfoot"><div class="fdots">${famLine(famsOf(f))}</div><div class="mlinks"><a href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${ic("ext", 14)}${f.rec ? "Official page" : "Details on Grants.gov"}</a>${f.deadline ? `<button data-fics="${esc(f.id)}">${ic("cal", 14)}Add deadline to calendar</button>` : ""}</div></div>
     </div></article>`;
 }
 function viewFunding() {
-  const all = FUND.items || [];
+  const all = [...recurring(), ...(FUND.items || [])];
   let list = all.filter((f) => fundOk(f));
   const count = (skip, test) => all.filter((f) => fundOk(f, skip) && test(f)).length;
   const types = F_TYPES.filter((t) => all.some((f) => f.type === t));
@@ -853,22 +868,23 @@ function viewFunding() {
     list = list.sort((x, y) => (y.firstSeen || "").localeCompare(x.firstSeen || ""));
     body = list.map(fundRow).join("");
   } else {
-    const soon = list.filter((f) => !f.rolling && daysTo(f.deadline) <= 30), later = list.filter((f) => !f.rolling && daysTo(f.deadline) > 30), open = list.filter((f) => f.rolling);
-    body = [["Closing in the next 30 days", soon], ["Later deadlines", later], ["Open any time", open]].filter(([, l]) => l.length)
+    const dated = list.filter((f) => f.deadline).sort((x, y) => x.deadline.localeCompare(y.deadline));
+    const soon = dated.filter((f) => daysTo(f.deadline) <= 30), later = dated.filter((f) => daysTo(f.deadline) > 30), open = list.filter((f) => f.rolling), waiting = list.filter((f) => f.waiting);
+    body = [["Closing in the next 30 days", soon], ["Later deadlines", later], ["Open any time", open], ["Recurring: next round not announced yet", waiting]].filter(([, l]) => l.length)
       .map(([h, l]) => `<section class="month"><h3>${h}</h3>${l.map(fundRow).join("")}</section>`).join("");
   }
   const awards = NEWS.items.filter((i) => i.category === "awards").slice(0, 6);
   return `<div class="layout"><aside class="filters" aria-label="Funding filters">
       <div><h4>Type</h4>${opt("ftype", "All", "All types", count("type", () => true))}${types.map((t) => opt("ftype", t, t, count("type", (f) => f.type === t))).join("")}</div>
       <div><h4>Who it's for</h4>${opt("fstage", "All", "Everyone", count("stage", () => true))}${F_STAGES.map((t) => opt("fstage", t, t, count("stage", (f) => f.stage === t))).join("")}</div>
-      <div><h4>Field</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All fields</span></button>${FAMILIES.map((fm) => `<button class="opt" data-theme="fam:${fm.id}" aria-pressed="${S.theme === `fam:${fm.id}`}"><span><i style="background:${fm.color}"></i>${esc(fm.label)}</span><span class="n">${count("theme", (f) => familiesOf(f).includes(fm.id))}</span></button>`).join("")}</div>
-      <div><h4>Agency</h4>${opt("fagency", "All", "All agencies", count("agency", () => true))}${agencies.map((t) => opt("fagency", t, t, count("agency", (f) => agencyOf(f).short === t))).join("")}</div>
+      <div><h4>Field</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All fields</span></button>${FAMILIES.map((fm) => `<button class="opt" data-theme="fam:${fm.id}" aria-pressed="${S.theme === `fam:${fm.id}`}"><span><i style="background:${fm.color}"></i>${esc(fm.label)}</span><span class="n">${count("theme", (f) => famsOf(f).includes(fm.id))}</span></button>`).join("")}</div>
+      <div><h4>From</h4>${opt("fagency", "All", "All agencies", count("agency", () => true))}${agencies.map((t) => opt("fagency", t, t, count("agency", (f) => agencyOf(f).short === t))).join("")}</div>
       <div><h4>Sort</h4>${opt("fsort", "deadline", "Deadline first", "")}${opt("fsort", "new", "Newest first", "")}</div>
     </aside><div>
-    <div class="toolbar"><label class="search"><input id="fq" type="search" placeholder="Search funding: hydrology, Mars, postdoc, NSF…" value="${esc(S.fq)}" aria-label="Search funding"></label><span class="count">${list.length} open</span></div>
+    <div class="toolbar"><label class="search"><input id="fq" type="search" placeholder="Search funding: hydrology, Mars, postdoc, NSF…" value="${esc(S.fq)}" aria-label="Search funding"></label><span class="count">${list.length} opportunities</span></div>
     ${body || `<p class="empty">${all.length ? "Nothing matches. Try another type, stage, field or agency." : "Funding opportunities appear here after the next update."}</p>`}
     ${awards.length ? `<section class="month"><h3>Awards &amp; prizes in the news</h3><div class="list">${awards.map(row).join("")}</div></section>` : ""}
-    <p class="note">U.S. federal opportunities from Grants.gov (NSF, NASA, NOAA, USGS, DOE, EPA and others), refreshed twice a day. Always check eligibility and the deadline on the official page before applying.</p>
+    <p class="note">U.S. federal opportunities come from Grants.gov (NSF, NASA, NOAA, USGS, DOE, EPA and others) and refresh twice a day. Recurring student, postdoc and early-career opportunities are kept by hand${OPP.checked ? `, last checked ${esc(fmt(OPP.checked, { day: "numeric", month: "long", year: "numeric" }))}` : ""}. Always check eligibility and the deadline on the official page before applying.</p>
     </div></div>`;
 }
 
@@ -997,6 +1013,7 @@ async function boot() {
   MEET = await fetch("conferences.json").then((r) => (r.ok ? r.json() : MEET)).catch(() => MEET);
   COMM = await fetch("community.json").then((r) => (r.ok ? r.json() : COMM)).catch(() => COMM);
   FUND = await fetch("funding.json").then((r) => (r.ok ? r.json() : FUND)).catch(() => FUND);
+  OPP = await fetch("opportunities.json").then((r) => (r.ok ? r.json() : OPP)).catch(() => OPP);
   CAT = Object.fromEntries((NEWS.categories || []).map((c) => [c.id, c]));
   ticker(); footer(); render();
 }

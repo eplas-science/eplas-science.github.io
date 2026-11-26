@@ -59,7 +59,7 @@ index.write_text(page, encoding="utf-8")
     "</urlset>\n",
     encoding="utf-8",
 )
-for name in ("og-image.png", "conferences.json"):
+for name in ("og-image.png", "conferences.json", "opportunities.json"):
     if (here / name).exists():
         shutil.copy(here / name, site / name)
 # Organiser logos for the conference pages (fetched once by fetch_logos.py).
