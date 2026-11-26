@@ -1,0 +1,36 @@
+name: Removal request
+description: You own something shown on EPLAS (a picture, summary or listing) and want it taken down.
+title: "Removal request: "
+labels: ["removal request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for getting in touch. EPLAS is a free, non-commercial digest that links to the original sources. We remove content on request, usually within a few days.
+        Please note this request is public. Don't include private details such as phone numbers or addresses.
+  - type: input
+    id: what
+    attributes:
+      label: What should be removed?
+      description: The headline, picture or listing, as it appears on EPLAS.
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: Link to the original
+      description: The article, picture or posting this comes from.
+    validations:
+      required: true
+  - type: input
+    id: who
+    attributes:
+      label: Who you are
+      description: Your name and the organisation that owns the content.
+    validations:
+      required: true
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else
+      description: For example, whether you'd rather we keep the headline and link but drop the picture.

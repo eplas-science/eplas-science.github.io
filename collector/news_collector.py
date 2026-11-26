@@ -21,6 +21,7 @@ import email.utils
 import hashlib
 import html
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -548,6 +549,9 @@ def classify(item):
 OG_SKIP = re.compile(r"sciencedirect\.com|onlinelibrary\.wiley\.com|agupubs\.|nature\.com|ipcc\.ch|noaa\.gov|volcano\.si\.edu|usgs\.gov|esa\.org", re.I)
 OG_RX = re.compile(r"""<meta[^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image(?::src)?)["'][^>]*content=["']([^"']+)|<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["'](?:og:image|twitter:image)["']""", re.I)
 OG_PER_RUN = 300
+# The public site (EPLAS) sets FEED_IMAGES_ONLY=1: it shows only pictures publishers put in their own
+# feeds, and drops share pictures collected earlier. The personal News Desk keeps them.
+FEED_IMAGES_ONLY = os.environ.get("FEED_IMAGES_ONLY") == "1"
 
 
 def og_image(url):
@@ -623,7 +627,13 @@ def main(out_dir, template=None):
         added += 1
     keep = [i for i in items.values() if parse_date(i["date"]) >= cutoff]
     keep.sort(key=lambda i: i["date"], reverse=True)
-    images_added = add_share_images(keep)
+    if FEED_IMAGES_ONLY:
+        images_added = 0
+        for i in keep:
+            if i.get("imageTried") and i.get("image"):  # came from the share-picture step
+                i["image"] = ""
+    else:
+        images_added = add_share_images(keep)
     data = {"updated": now.isoformat(timespec="minutes"), "added": added,
             "categories": [{"id": c, "label": l, "color": col} for c, l, col in CATEGORIES],
             "sources": sorted(status, key=lambda s: s["source"]), "items": keep}

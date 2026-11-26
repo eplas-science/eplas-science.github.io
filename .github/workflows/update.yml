@@ -32,6 +32,8 @@ jobs:
           curl -fsSL "$base/funding.json" -o site/funding.json || rm -f site/funding.json
       - name: Collect news, papers and jobs
         run: python collector/news_collector.py site collector/heg_site.html
+        env:
+          FEED_IMAGES_ONLY: "1"   # only pictures publishers put in their own feeds
       - name: Make the site readable for search engines (headlines, robots.txt, sitemap)
         run: python collector/seo.py site
       - name: Open funding opportunities (Grants.gov)
