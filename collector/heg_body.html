@@ -45,6 +45,24 @@
 .bchip span { color: var(--c); font-weight: 600; margin-left: 2px; }
 .bchip:hover { background: color-mix(in srgb, var(--c) 15%, white); }
 .opt.fam { font-weight: 600; margin-top: 6px; }
+.ladder { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: flex-end; margin-bottom: 14px; }
+.track small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #6b7280; margin: 0 0 5px 2px; }
+.rungs { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.rungs > i { color: #b6bcc6; font-style: normal; }
+.rung { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; border: 1px solid #dde1e7; background: #fff; border-radius: 10px; padding: 6px 11px; cursor: pointer; font: inherit; color: #1f2733; }
+.rung b { font-size: 13.5px; font-weight: 600; }
+.rung span { font-size: 12px; color: #8a93a3; font-variant-numeric: tabular-nums; }
+.rung:hover { border-color: #0f766e; }
+.rung[aria-pressed="true"] { background: #0f766e; border-color: #0f766e; color: #fff; }
+.rung[aria-pressed="true"] span { color: #cdeee8; }
+.skills { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.skills.big { margin-top: 0; }
+.skill { border: 1px solid #e1e4ea; background: #f7f8fa; color: #374151; border-radius: 999px; padding: 2px 9px; font: inherit; font-size: 12px; cursor: pointer; }
+.skill span { color: #8a93a3; }
+.skill:hover { border-color: #0f766e; }
+.skill[aria-pressed="true"] { background: #e6f4f1; border-color: #0f766e; color: #0f5e57; font-weight: 600; }
+.pill.soft { background: #f1f3f6; color: #4b5563; }
+.filters h4 .clear { border: 0; background: none; color: #0f766e; font: inherit; font-size: 12px; cursor: pointer; text-transform: none; letter-spacing: 0; padding: 0 0 0 6px; }
 .opt.sub { padding-left: 26px; font-size: 13.5px; }
 .modal-scroll { max-height: 60vh; overflow: auto; padding-right: 4px; }
 .modal-scroll h4 { margin: 12px 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
@@ -136,7 +154,7 @@ THEMES.forEach((t) => { t.color = FAM[t.family].color; });
 const TH = Object.fromEntries(THEMES.map((t) => [t.id, t]));
 
 let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, CAT = {};
-const S = { q: "", cat: null, theme: null, days: 45, mine: false, jq: "", jtype: "All", jsort: "fit", savedOnly: false,
+const S = { q: "", cat: null, theme: null, days: 45, mine: false, jq: "", jlevel: "All", jsector: "All", jskills: new Set(), jsort: "fit", savedOnly: false,
   mineThemes: new Set(store.get("branches", THEMES.map((t) => t.id)).filter((id) => THEMES.some((t) => t.id === id))), saved: new Set(store.get("saved", [])) };
 if (!S.mineThemes.size) S.mineThemes = new Set(THEMES.map((t) => t.id));
 
@@ -263,7 +281,19 @@ function viewList(kind) {
 }
 
 /* jobs */
-const JOB_TYPES = ["All", "PhD & MS", "Postdoc", "Faculty", "Research staff", "Government", "Other"];
+const TRACKS = [
+  { label: "Industry & government", levels: ["Internship & student", "Entry level", "Mid-career", "Senior & lead"] },
+  { label: "Academic", levels: ["Graduate (MS/PhD)", "Postdoc", "Faculty"] },
+];
+const SECTORS = ["Academia", "Government", "Industry", "Research institute", "Non-profit", "Other"];
+const SKILLS = ["GIS", "Python", "R", "MATLAB", "Programming", "Data science & ML", "Numerical modelling", "Remote sensing", "Field work & mapping", "Geophysics",
+  "Lab & geochemistry", "Drilling & logging", "Hydrology & water", "Geotechnical", "CAD & surveying", "Regulatory & permitting", "Teaching", "Project management",
+  "Grant & scientific writing", "Licensure (PG/PE)"];
+const OLD_TYPE = { "PhD & MS": "Graduate (MS/PhD)", Postdoc: "Postdoc", Faculty: "Faculty" };
+const levelOf = (j) => j.level || OLD_TYPE[j.type] || "Mid-career";
+const sectorOf = (j) => j.sector || (j.type === "Government" ? "Government" : "Other");
+const jobOk = (j, skip) => (skip === "level" || S.jlevel === "All" || levelOf(j) === S.jlevel) && (skip === "sector" || S.jsector === "All" || sectorOf(j) === S.jsector)
+  && (skip === "theme" || !S.theme || inTheme(j, S.theme)) && (skip === "skills" || [...S.jskills].every((k) => (j.skills || []).includes(k)));
 const jobFit = (j) => themesOf(j).length + myScore(j) + (j.match || 0) / 2;
 const initials = (s) => (s || "?").replace(/\b(of|the|and|at|for)\b/gi, "").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 const hue = (s) => { let h = 0; for (const c of s || "") h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
@@ -271,13 +301,13 @@ function jobRow(j) {
   const fit = Math.min(5, Math.round(jobFit(j)));
   return `<article class="job"><div class="mark" style="background:hsl(${hue(j.employer)} 45% 38%)" aria-hidden="true">${esc(initials(j.employer))}</div>
     <div><a href="${esc(safeUrl(j.link))}" target="_blank" rel="noopener"><h3>${esc(j.title)}</h3></a><div class="who">${esc(j.employer)}${j.location ? ` · ${esc(j.location)}` : ""}</div>
-    <div class="meta"><span class="pill">${esc(j.type)}</span>${j.salary ? `<span>${esc(j.salary)}</span>` : ""}<span>Posted ${ago(j.date)}</span><span>${esc(j.board)}</span>${isNew(j, JOBS) ? '<span class="pill new">New</span>' : ""}</div>
-    ${j.summary ? `<p>${esc(j.summary)}</p>` : ""}${themeLine(j)}</div>
+    <div class="meta"><span class="pill">${esc(levelOf(j))}</span><span class="pill soft">${esc(sectorOf(j))}</span>${j.salary ? `<span>${esc(j.salary)}</span>` : ""}<span>Posted ${ago(j.date)}</span><span>${esc(j.board)}</span>${isNew(j, JOBS) ? '<span class="pill new">New</span>' : ""}</div>
+    ${j.summary ? `<p>${esc(j.summary)}</p>` : ""}${(j.skills || []).length ? `<div class="skills" aria-label="Skills asked for">${j.skills.map((k) => `<button class="skill" data-jskill="${esc(k)}" aria-pressed="${S.jskills.has(k)}">${esc(k)}</button>`).join("")}</div>` : ""}${themeLine(j)}</div>
     <div class="right"><button class="save" data-save="${esc(j.id)}" aria-pressed="${S.saved.has(j.id)}" aria-label="Save this job">${S.saved.has(j.id) ? "★" : "☆"}</button>
     <div class="fit" title="How many branches it matches">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= fit ? "on" : ""}"></i>`).join("")}</div></div></article>`;
 }
 function elsewhere() {
-  const q = S.jq || "hydrogeophysics";
+  const q = S.jq || "geologist";
   const e = encodeURIComponent(q);
   const links = [["LinkedIn", `https://www.linkedin.com/jobs/search/?keywords=${e}`], ["Indeed", `https://www.indeed.com/jobs?q=${e}`],
     ["Handshake", `https://app.joinhandshake.com/stu/postings?query=${e}`], ["USAJOBS", `https://www.usajobs.gov/search/results/?k=${e}`],
@@ -286,18 +316,26 @@ function elsewhere() {
 }
 function viewJobs() {
   const q = S.jq.toLowerCase();
-  let list = JOBS.items.filter((j) => (S.jtype === "All" || j.type === S.jtype) && (!S.theme || inTheme(j, S.theme)) && (!S.savedOnly || S.saved.has(j.id)) && (!q || `${j.title} ${j.employer} ${j.location} ${j.summary}`.toLowerCase().includes(q)));
+  const pool = JOBS.items.filter((j) => (!S.savedOnly || S.saved.has(j.id)) && (!q || `${j.title} ${j.employer} ${j.location} ${j.summary} ${(j.skills || []).join(" ")}`.toLowerCase().includes(q)));
+  let list = pool.filter((j) => jobOk(j));
   list = list.sort(S.jsort === "fit" ? (a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date) : (a, b) => b.date.localeCompare(a.date));
-  const n = (t) => (t === "All" ? JOBS.items.length : JOBS.items.filter((j) => j.type === t).length);
+  const count = (skip, test) => pool.filter((j) => jobOk(j, skip) && test(j)).length;
+  const ladder = `<div class="ladder" role="group" aria-label="Career level">
+      <button class="rung all" data-jlevel="All" aria-pressed="${S.jlevel === "All"}"><b>All levels</b><span>${count("level", () => true)}</span></button>
+      ${TRACKS.map((t) => `<div class="track"><small>${esc(t.label)}</small><div class="rungs">${t.levels.map((l) => `<button class="rung" data-jlevel="${esc(l)}" aria-pressed="${S.jlevel === l}"><b>${esc(l)}</b><span>${count("level", (j) => levelOf(j) === l)}</span></button>`).join('<i aria-hidden="true">›</i>')}</div></div>`).join("")}
+    </div>`;
+  const skillCounts = SKILLS.map((k) => [k, count("skills", (j) => (j.skills || []).includes(k))]).filter(([k, n]) => n || S.jskills.has(k)).sort((a, b) => b[1] - a[1]);
   return `<div class="layout"><aside class="filters" aria-label="Job filters">
-      <div><h4>Position</h4>${JOB_TYPES.map((t) => `<button class="opt" data-jtype="${esc(t)}" aria-pressed="${S.jtype === t}"><span>${esc(t)}</span><span class="n">${n(t)}</span></button>`).join("")}</div>
-      <div><h4>Field</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All fields</span></button>${FAMILIES.map((f) => `<button class="opt" data-theme="fam:${f.id}" aria-pressed="${S.theme === `fam:${f.id}`}"><span><i style="background:${f.color}"></i>${esc(f.label)}</span><span class="n">${JOBS.items.filter((j) => familiesOf(j).includes(f.id)).length}</span></button>`).join("")}</div>
+      <div><h4>Sector</h4>${["All", ...SECTORS].map((t) => `<button class="opt" data-jsector="${esc(t)}" aria-pressed="${S.jsector === t}"><span>${t === "All" ? "All sectors" : esc(t)}</span><span class="n">${count("sector", (j) => t === "All" || sectorOf(j) === t)}</span></button>`).join("")}</div>
+      <div><h4>Field</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All fields</span></button>${FAMILIES.map((f) => `<button class="opt" data-theme="fam:${f.id}" aria-pressed="${S.theme === `fam:${f.id}`}"><span><i style="background:${f.color}"></i>${esc(f.label)}</span><span class="n">${count("theme", (j) => familiesOf(j).includes(f.id))}</span></button>`).join("")}</div>
+      <div><h4>Skills${S.jskills.size ? ` <button class="clear" data-jskill-clear>Clear</button>` : ""}</h4><div class="skills big">${skillCounts.map(([k, n]) => `<button class="skill" data-jskill="${esc(k)}" aria-pressed="${S.jskills.has(k)}">${esc(k)} <span>${n}</span></button>`).join("")}</div></div>
       <div><h4>Sort</h4><button class="opt" data-jsort="fit" aria-pressed="${S.jsort === "fit"}"><span>Best fit first</span></button><button class="opt" data-jsort="new" aria-pressed="${S.jsort === "new"}"><span>Newest first</span></button></div>
       <div><h4>Saved</h4><button class="opt" data-saved aria-pressed="${S.savedOnly}"><span>Only saved jobs</span><span class="n">${S.saved.size}</span></button></div>
     </aside><div>
-    <div class="toolbar"><label class="search"><input id="jq" type="search" placeholder="Search jobs: hydrogeologist, postdoc, Ohio…" value="${esc(S.jq)}" aria-label="Search jobs"></label><span class="count">${list.length} jobs</span></div>
+    ${ladder}
+    <div class="toolbar"><label class="search"><input id="jq" type="search" placeholder="Search jobs: geologist, GIS, postdoc, Colorado…" value="${esc(S.jq)}" aria-label="Search jobs"></label><span class="count">${list.length} jobs</span></div>
     ${elsewhere()}
-    <div class="list">${list.slice(0, 150).map(jobRow).join("") || '<p class="empty">No jobs match. Try another search, field or position type.</p>'}</div></div></div>`;
+    <div class="list">${list.slice(0, 150).map(jobRow).join("") || '<p class="empty">No jobs match. Try another level, sector, field or skill.</p>'}</div></div></div>`;
 }
 
 /* ---------- choose themes ---------- */
@@ -349,7 +387,10 @@ document.addEventListener("click", (e) => {
   else if (d.trend) { S.q = d.trend; S.theme = null; location.hash = "#news"; }
   else if (d.gotoTheme) { S.theme = d.gotoTheme; S.cat = null; }
   else if (d.editThemes !== undefined) editThemes();
-  else if (d.jtype) { S.jtype = d.jtype; render(); }
+  else if (d.jlevel) { S.jlevel = d.jlevel; render(); }
+  else if (d.jsector) { S.jsector = d.jsector; render(); }
+  else if (d.jskill) { S.jskills.has(d.jskill) ? S.jskills.delete(d.jskill) : S.jskills.add(d.jskill); render(); }
+  else if (d.jskillClear !== undefined) { S.jskills.clear(); render(); }
   else if (d.jsort) { S.jsort = d.jsort; render(); }
   else if (d.saved !== undefined) { S.savedOnly = !S.savedOnly; render(); }
   else if (d.save) { S.saved.has(d.save) ? S.saved.delete(d.save) : S.saved.add(d.save); store.set("saved", [...S.saved]); render(); }

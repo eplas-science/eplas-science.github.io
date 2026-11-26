@@ -268,15 +268,79 @@ def image_of(it, descs):
 
 
 # ------------------------------------------------------------------------------------------------
-# Jobs: open job boards that publish RSS. Searches cover the lab's fields; results are de-duplicated.
+# Jobs: open job boards that publish RSS. Searches cover every branch of Earth and planetary
+# science; results are de-duplicated.
 JOB_BOARDS = [
     ("AGU Career Center", "https://findajob.agu.org/jobsrss/?keywords={q}"),
     ("Science Careers", "https://jobs.sciencecareers.org/jobsrss/?keywords={q}"),
     ("Chronicle Jobs", "https://jobs.chronicle.com/jobsrss/?keywords={q}"),
 ]
-JOB_QUERIES = ["hydrology", "hydrogeology", "groundwater", "geophysics", "ecohydrology", "soil", "water+resources",
-               "biogeochemistry", "ecology", "climate", "environmental+science", "geoscience", "postdoctoral+hydrology"]
-OPEN_BOARDS = [("Conservation Job Board", "https://www.conservationjobboard.com/rss")]
+JOB_QUERIES = ["geology", "geologist", "geoscience", "earth+science", "geophysics", "hydrology", "hydrogeology",
+               "groundwater", "soil+science", "geochemistry", "seismology", "volcanology", "sedimentology",
+               "paleontology", "geomorphology", "structural+geology", "petrology", "mineralogy", "planetary+science",
+               "engineering+geology", "mining+geology", "petroleum+geology", "remote+sensing", "GIS", "oceanography",
+               "glaciology", "atmospheric+science", "climate", "ecology", "biogeochemistry", "ecohydrology",
+               "environmental+science", "water+resources", "geoscience+internship", "postdoctoral+geoscience"]
+OPEN_BOARDS = [("Conservation Job Board", "https://www.conservationjobboard.com/rss")] + [
+    ("ASCE Civil Engineering Jobs", f"https://careers.asce.org/jobsrss/?keywords={q}")
+    for q in ("geotechnical", "engineering+geologist", "hydrogeologist", "geologist")]
+# These boards publish the full posting as structured data (JSON-LD); the others refuse page reads.
+DESC_BOARDS = {"Science Careers", "Chronicle Jobs", "Conservation Job Board"}
+DESC_PER_RUN = 500
+RX_EARTH = re.compile(r"geo|earth|hydro|soil|climat|ecolog|environment|ocean|atmospher|planet|mars\b|lunar|mineral|"
+                      r"petrol|seism|volcan|sediment|paleo|glaci|water|\bgis\b|remote sensing|mining|tecton|"
+                      r"coast|wetland|watershed|forest|conservation|natural resource", re.I)
+
+# Career level: read from the title first, then from the years of experience the posting asks for.
+JOB_LEVELS = [  # first match on the title wins
+    ("Internship & student", r"\bintern(?:ship)?s?\b|co-?op\b|summer (?:student|position|research)|undergraduate|\bREU\b"),
+    ("Graduate (MS/PhD)", r"\bph\.?d\b.*(?:opportunit|position|student|assistantship|fellowship)|graduate (?:research |teaching )?assistant|graduate student|m\.?s\.? (?:student|position)|studentship|assistantship|doctoral (?:student|position|candidate)"),
+    ("Postdoc", r"post-?doc|postdoctoral"),
+    ("Faculty", r"professor|faculty|lecturer|tenure|instructor|\bchair\b"),
+    ("Senior & lead", r"\bsenior\b|\bsr\.?\b|principal|\blead\b|director|\bhead\b|chief|manager|supervis|\b(?:III|IV|V)\b"),
+    ("Entry level", r"entry[- ]level|junior|\bjr\.?\b|trainee|technician|\btech\b|early[- ]career|recent graduate|"
+                    r"\b(?:I|1)\b|assistant (?!professor)|staff (?:geolog|engineer|scientist|hydro)|field (?:geolog|scientist|crew)|seasonal"),
+]
+LEVEL_ORDER = ["Internship & student", "Entry level", "Mid-career", "Senior & lead", "Graduate (MS/PhD)", "Postdoc", "Faculty"]
+RX_YEARS = re.compile(r"(\d{1,2})\s*(?:\+|or more|to \d+|-\s*\d+)?\s*years?(?: of)?(?: \w+){0,4}? (?:experience|work)", re.I)
+
+# Sector: read from the employer first, then from the posting.
+JOB_SECTORS = [
+    ("Government", r"\busgs\b|\bnoaa\b|\bepa\b|\bnasa\b|\bblm\b|\busda\b|geological survey|department of|dept\.? of|"
+                   r"state of|county|city of|federal|agency|national park|forest service|bureau|ministry|commonwealth|army corps|"
+                   r"water (?:district|authority)|public (?:works|utilit)|government|\bstate\b.*(?:division|office)"),
+    ("Academia", r"universit|college|school of|polytechnic|institute of technology|\bmit\b|caltech|academ"),
+    ("Research institute", r"national laborator|\blab(?:oratory)?\b|institut|observatory|museum|smithsonian|research (?:center|centre|foundation)|"
+                           r"\bjpl\b|\bncar\b|\bwhoi\b|\bmbari\b|consortium|\bunavco\b|earthscope|\biris\b"),
+    ("Non-profit", r"conservancy|unlimited|foundation|\btrust\b|society|non-?profit|alliance|council|association|audubon|land trust|"
+                   r"wildlife federation|\bwwf\b|watershed (?:council|association)|\bfriends of\b|coalition"),
+]
+
+# Skills the posting asks for, read from the whole posting where the board publishes it.
+JOB_SKILLS = [
+    ("GIS", r"\bgis\b|arcgis|arcmap|qgis|geospatial|spatial analys"),
+    ("Python", r"\bpython\b"),
+    ("R", r"\bR\b(?: ?(?i:programming|statistical|language|studio|packages?)|,| or| and)|(?i:\brstudio\b)"),
+    ("MATLAB", r"matlab"),
+    ("Programming", r"\bc\+\+|fortran|\bjulia\b|\bjava\b|\bsql\b|programming|scripting|software develop"),
+    ("Data science & ML", r"machine learning|deep learning|data scien|artificial intelligence|\bAI\b|statistic|big data|neural net"),
+    ("Numerical modelling", r"model(?:l)?ing|simulation|numerical|modflow|finite element|hec-ras|swat\b|parflow|\bcfd\b"),
+    ("Remote sensing", r"remote sensing|satellite|lidar|\binsar\b|imagery|hyperspectral|\buav\b|drone"),
+    ("Field work & mapping", r"field ?work|field (?:work|mapping|campaign|investigation|program|sampling|data collection)|geologic(?:al)? mapping|"
+                             r"site characteri|core logging|sample collection"),
+    ("Geophysics", r"geophysic|seismic|\bgpr\b|ground[- ]penetrating|resistivity|electromagnetic|magnetotelluric|gravity|\bert\b"),
+    ("Lab & geochemistry", r"geochemi|laboratory|\blab\b|mass spectrom|icp-?ms|\bxrd\b|\bsem\b|isotop|microscop|analytical chemistry"),
+    ("Drilling & logging", r"drilling|borehole|well logg|core (?:logging|description)|\bwell installation|mud logg|subsurface investigation"),
+    ("Hydrology & water", r"hydrolog|hydrogeolog|groundwater|aquifer|water quality|watershed|stormwater|surface water"),
+    ("Geotechnical", r"geotechnic|slope stability|foundation (?:design|engineering)|soil mechanic|rock mechanic|landslide"),
+    ("CAD & surveying", r"autocad|\bcad\b|civil 3d|surveying|\bgnss\b|\bgps\b|total station"),
+    ("Regulatory & permitting", r"regulat|permit|compliance|\bnepa\b|\bcercla\b|\brcra\b|environmental assessment|remediation"),
+    ("Teaching", r"teach|instruct(?:ion|or)|curriculum|course(?:s|work)? (?:in|on)|mentor students|pedagog"),
+    ("Project management", r"project management|manage projects|budget|proposal writing|client|supervis"),
+    ("Grant & scientific writing", r"grant|publication|peer-reviewed|manuscript|scientific writing|publish"),
+    ("Licensure (PG/PE)", r"(?i:professional geologist|licens|registered geologist)|\bP\.G\.|\bPG\b|\bP\.E\.|\bPE\b|\bEIT\b|\bGIT\b"),
+]
+JOB_SKILLS = [(name, re.compile(rx, re.I if name not in ("R", "Licensure (PG/PE)") else 0)) for name, rx in JOB_SKILLS]
 JOB_KEEP_DAYS = 75
 JOB_TYPES = [  # first match wins
     ("PhD & MS", r"\bph\.?d\b.*(?:opportunit|position|student|assistantship|fellowship)|graduate (?:research )?assistant|graduate student|m\.?s\.? (?:student|position)|studentship|assistantship"),
@@ -329,6 +393,81 @@ def fetch_jobs(board, url):
     return out
 
 
+def posting_text(url):
+    """The full description a board publishes as JSON-LD JobPosting, as plain text ('' if none)."""
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html"})
+    with urllib.request.urlopen(req, timeout=15) as response:
+        page = response.read(600_000).decode("utf-8", "replace")
+    for block in re.findall(r"(?s)<script[^>]+application/ld\+json[^>]*>(.*?)</script>", page):
+        try:
+            data = json.loads(block)
+        except ValueError:
+            continue
+        for d in data if isinstance(data, list) else [data]:
+            if isinstance(d, dict) and d.get("@type") == "JobPosting":
+                return clean(html.unescape(d.get("description", "")))
+    return ""
+
+
+def job_level(j):
+    title = j["title"]
+    for name, rx in JOB_LEVELS:
+        if re.search(rx, title, re.I):
+            return name
+    years = j.get("years")
+    if years is not None:
+        return "Entry level" if years <= 2 else "Senior & lead" if years >= 8 else "Mid-career"
+    hay = f"{j['summary']} {j.get('desc', '')[:1500]}"
+    for name, rx in JOB_LEVELS[:4]:  # student, graduate, postdoc and faculty jobs often say so only in the text
+        if re.search(rx, hay, re.I):
+            return name
+    return "Mid-career"
+
+
+def job_sector(j):
+    for text in (j["employer"], f"{j['title']} {j['summary']} {j.get('desc', '')[:800]}"):
+        for name, rx in JOB_SECTORS:
+            if re.search(rx, text, re.I):
+                return name
+    return "Industry" if j["employer"] else "Other"
+
+
+def job_skills(j):
+    hay = f"{j['title']} {j['summary']} {j.get('desc', '')}"
+    return [name for name, rx in JOB_SKILLS if rx.search(hay)]
+
+
+def job_years(desc):
+    found = [int(m.group(1)) for m in RX_YEARS.finditer(desc) if 0 < int(m.group(1)) < 30]
+    return min(found) if found else None
+
+
+def describe_jobs(jobs):
+    """Read the full posting once per job (where the board allows) and keep only the tags."""
+    todo = [j for j in jobs if "skills" not in j or (not j.get("described") and j["board"] in DESC_BOARDS)]
+    fetch = [j for j in todo if not j.get("described") and j["board"] in DESC_BOARDS][:DESC_PER_RUN]
+    texts = {}
+    with cf.ThreadPoolExecutor(12) as ex:
+        futures = {ex.submit(posting_text, j["link"]): j for j in fetch}
+        for f in cf.as_completed(futures):
+            j = futures[f]
+            j["described"] = True
+            try:
+                texts[j["id"]] = f.result()
+            except Exception:  # page refused: tags come from the title and summary
+                pass
+    for j in todo:
+        desc = texts.get(j["id"], "")
+        work = dict(j, desc=desc)
+        if desc:
+            j["years"] = job_years(desc)
+        work["years"] = j.get("years")
+        j["skills"] = sorted(set(j.get("skills", [])) | set(job_skills(work)), key=[n for n, _ in JOB_SKILLS].index)
+        j["level"] = job_level(work)
+        j["sector"] = job_sector(work)
+    return len(texts)
+
+
 def job_type(j):
     hay = f"{j['title']} {j['summary']}"
     for name, rx in JOB_TYPES:
@@ -374,6 +513,8 @@ def collect_jobs(out, now):
         hay = f"{j['title']} {j['employer']} {j['summary']}"
         if j["board"] == "Conservation Job Board" and not RX_RELEVANT.search(j["title"]):
             continue
+        if not RX_EARTH.search(hay):  # broad searches also return unrelated jobs
+            continue
         topics = [k for k in ORDER if k not in ("awards", "conferences", "policy") and RX[k].search(hay)]
         jobs[key] = {"id": key, "title": j["title"], "employer": j["employer"], "location": j["location"],
                      "salary": j["salary"], "summary": j["summary"], "link": j["link"], "board": j["board"],
@@ -383,7 +524,8 @@ def collect_jobs(out, now):
         seen.add(same)
         added += 1
     keep = sorted((j for j in jobs.values() if parse_date(j["date"]) >= cutoff), key=lambda j: j["date"], reverse=True)
-    data = {"updated": now.isoformat(timespec="minutes"), "added": added, "sources": sorted(status.values(), key=lambda s: s["source"]), "items": keep}
+    described = describe_jobs(keep)
+    data = {"updated": now.isoformat(timespec="minutes"), "added": added, "described": described, "sources": sorted(status.values(), key=lambda s: s["source"]), "items": keep}
     store.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     return data
 
