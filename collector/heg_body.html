@@ -316,6 +316,7 @@
 
 <script id="news-data" type="application/json">/*__NEWS_DATA__*/null</script>
 <script id="jobs-data" type="application/json">/*__JOBS_DATA__*/null</script>
+<script data-goatcounter="https://eplas-science.goatcounter.com/count" data-goatcounter-settings='{"no_onload": true}' async src="https://gc.zgo.at/count.js"></script>
 <script>
 (() => {
 "use strict";
@@ -811,12 +812,23 @@ function editThemes() {
 
 /* ---------- render + routing ---------- */
 const route = () => (["today", "branches", "news", "papers", "jobs", "funding", "conferences", "community"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
+/* Anonymous visit counting (GoatCounter: no cookies, no personal data); one count per tab opened. */
+let counted = "";
+function countView(r) {
+  const path = r === "today" ? "/" : `/#${r}`;
+  if (path === counted) return;
+  counted = path;
+  const send = (tries) => (window.goatcounter && window.goatcounter.count ? window.goatcounter.count({ path, title: r[0].toUpperCase() + r.slice(1) })
+    : tries < 30 && setTimeout(() => send(tries + 1), 300));
+  send(0);
+}
 function render() {
   const r = route(), view = $("#view");
   const keep = document.activeElement?.id, pos = document.activeElement?.selectionStart;
   document.querySelectorAll("nav.tabs a").forEach((a) => a.setAttribute("aria-current", a.getAttribute("href") === `#${r}` ? "page" : "false"));
   view.innerHTML = !NEWS.items.length && !["jobs", "funding", "conferences", "community"].includes(r) ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "conferences" ? viewConferences() : r === "community" ? viewCommunity() : r === "funding" ? viewFunding() : r === "branches" ? viewBranches() : viewToday();
   paint(view);
+  countView(r);
   if (keep && document.getElementById(keep)) { const el = document.getElementById(keep); el.focus(); if (pos != null && el.setSelectionRange) el.setSelectionRange(pos, pos); }
 }
 function ticker() {
@@ -826,7 +838,7 @@ function ticker() {
 }
 function footer() {
   const ok = (NEWS.sources || []).filter((s) => s.ok).length;
-  $("#foot").innerHTML = `<div>An informal, automatically updated digest of news, research papers and jobs from public feeds and job boards. Summaries are the publishers' own. Not affiliated with any university.</div>`
+  $("#foot").innerHTML = `<div>An informal, automatically updated digest of news, research papers and jobs from public feeds and job boards. Summaries are the publishers' own. Not affiliated with any university. Visits are counted anonymously with GoatCounter: no cookies and no personal data.</div>`
     + `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} public news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards, twice a day. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; where a story has none, a card shows its field and source.</div>`
     + `<details><summary>Sources</summary><ul>${[...(NEWS.sources || []), ...(JOBS.sources || [])].map((s) => `<li>${esc(s.source)} ${s.ok ? `· ${s.count}` : "· unavailable"}</li>`).join("")}</ul></details>`;
 }
