@@ -216,6 +216,41 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
 .bchip span { color: var(--c); font-weight: 600; margin-left: 2px; }
 .bchip:hover { background: color-mix(in srgb, var(--c) 15%, white); }
 .opt.fam { font-weight: 600; margin-top: 6px; }
+.comm { display: flex; flex-direction: column; gap: 8px; }
+.comm-hero { border-radius: 16px; padding: 26px 26px 20px; background: linear-gradient(135deg, #0f3b3a, #134e4a 55%, #1e3a5f); color: #fff; }
+.comm-hero small { font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: #9fd3c7; }
+.comm-hero h2 { margin: 6px 0 8px; font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: clamp(22px, 3.4vw, 32px); line-height: 1.15; max-width: 24ch; }
+.comm-hero p { margin: 0 0 14px; max-width: 62ch; color: #d7ece7; line-height: 1.5; }
+.comm-hero .btn { text-decoration: none; }
+.comm-hero .btn.primary { background: #e9c46a; border-color: #e9c46a; color: #1f2733; }
+.comm-hero .fine { font-size: 12.5px; color: #9fd3c7; margin: 12px 0 0; }
+.starts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.start { display: flex; flex-direction: column; gap: 4px; padding: 14px; border: 1px solid #e1e4ea; border-radius: 12px; background: #fff; color: #1f2733; text-decoration: none; }
+.start:hover { border-color: #0f766e; box-shadow: 0 3px 10px rgba(16, 24, 40, .08); }
+.start .em { font-size: 22px; }
+.start p, .room p { margin: 0; font-size: 13px; color: #5b6472; line-height: 1.4; }
+.rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.room { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px; border-left: 4px solid var(--c); background: color-mix(in srgb, var(--c) 6%, white); color: #1f2733; text-decoration: none; }
+.room:hover { background: color-mix(in srgb, var(--c) 12%, white); }
+.room b { color: var(--c); }
+.room small { color: #8a93a3; font-size: 12px; margin-top: 2px; }
+.threads { display: flex; flex-direction: column; }
+.thread { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 4px; border-bottom: 1px solid #eef0f3; color: #1f2733; text-decoration: none; }
+.thread:hover b { color: #0f766e; }
+.thread img, .thread .av { width: 36px; height: 36px; border-radius: 50%; background: #e5e7eb; }
+.thread p { margin: 3px 0 0; font-size: 13.5px; color: #5b6472; line-height: 1.4; }
+.tmeta { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; margin-top: 5px; font-size: 12.5px; color: #6b7280; }
+.tlab { color: var(--c); font-weight: 600; }
+.tcount { text-align: center; min-width: 52px; }
+.tcount b { display: block; font-size: 18px; }
+.tcount small { display: block; font-size: 11.5px; color: #8a93a3; }
+.comm-empty { border: 1px dashed #cfd5dd; border-radius: 12px; padding: 18px; text-align: center; }
+.comm-empty p { margin: 6px 0 0; color: #4b5563; }
+.comm-empty a { color: #0f766e; font-weight: 600; }
+.bchip[aria-pressed="true"] { background: var(--c); color: #fff; border-color: var(--c); }
+.rules { margin-top: 10px; padding: 14px 18px; border-radius: 12px; background: #f7f8fa; }
+.rules h3 { margin: 0 0 6px; font-size: 15px; }
+.rules ul { margin: 0; padding-left: 18px; color: #4b5563; font-size: 13.5px; line-height: 1.6; }
 .meet-next { border-radius: 14px; padding: 18px 20px; margin-bottom: 18px; background: color-mix(in srgb, var(--c) 9%, white); border-left: 5px solid var(--c); }
 .meet-next small { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c); }
 .meet-next h2 { margin: 4px 0 2px; font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: clamp(20px, 3vw, 28px); }
@@ -297,7 +332,7 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
 <header class="top"><div class="wrap">
   <div class="brand"><h1>The <span>Continuum</span></h1><small>Earth &amp; planetary science · news, research papers and jobs</small></div>
   <nav class="tabs" aria-label="Sections">
-    <a href="#today">Today</a><a href="#branches">Branches</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a><a href="#conferences">Conferences</a>
+    <a href="#today">Today</a><a href="#branches">Branches</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a><a href="#conferences">Conferences</a><a href="#community">Community</a>
   </nav>
 </div></header>
 <div class="ticker" aria-label="Latest headlines"><div class="wrap"><span class="tag">Live</span><div class="window"><div class="track" id="ticker"></div></div></div></div>
@@ -359,8 +394,8 @@ const FAM = Object.fromEntries(FAMILIES.map((f) => [f.id, f]));
 THEMES.forEach((t) => { t.color = FAM[t.family].color; });
 const TH = Object.fromEntries(THEMES.map((t) => [t.id, t]));
 
-let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, MEET = { items: [], tba: [] }, CAT = {};
-const S = { q: "", cat: null, theme: null, days: 45, mine: false, mfield: null, mregion: "All", jq: "", jlevel: "All", jsector: "All", jskills: new Set(), jsort: "fit", savedOnly: false,
+let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, MEET = { items: [], tba: [] }, COMM = { items: [], categories: [] }, CAT = {};
+const S = { q: "", cat: null, theme: null, days: 45, mine: false, cfield: null, mfield: null, mregion: "All", jq: "", jlevel: "All", jsector: "All", jskills: new Set(), jsort: "fit", savedOnly: false,
   mineThemes: new Set(store.get("branches", THEMES.map((t) => t.id)).filter((id) => THEMES.some((t) => t.id === id))), saved: new Set(store.get("saved", [])) };
 if (!S.mineThemes.size) S.mineThemes = new Set(THEMES.map((t) => t.id));
 
@@ -463,6 +498,8 @@ function viewToday() {
   const wider = items.filter((i) => i !== lead && !themesOf(i).length && i.kind === "News").slice(0, 10);
   if (wider.length) html += `<section style="--c:#64748b"><div class="sec-head"><h2>Wider field</h2><span class="hint">Science and environment news outside the branches above</span><a class="more" href="#news">All news</a></div><div class="rail">${wider.map(tile).join("")}</div></section>`;
   html += `</div><p class="note">Showing ${S.mineThemes.size} of ${THEMES.length} branches. <button class="linkbtn" data-edit-themes>Choose your branches</button> · <a href="#branches">Explore all branches</a></p>`;
+  const talk = (COMM.items || []).slice(0, 3);
+  if (talk.length) html += `<section><div class="sec-head"><h2>From the community</h2><span class="hint">The latest conversations</span><a class="more" href="#community">Community</a></div><div class="threads">${talk.map(threadRow).join("")}</div></section>`;
   const soon = upcoming().slice(0, 4);
   if (soon.length) html += `<section><div class="sec-head"><h2>Coming up</h2><span class="hint">The next major meetings</span><a class="more" href="#conferences">All conferences</a></div><div class="meet-strip">${soon.map(meetMini).join("")}</div></section>`;
   if (topJobs.length) html += `<section><div class="sec-head"><h2>Jobs in these fields</h2><span class="hint">${JOBS.items.length} open positions from the AGU, Science and Chronicle job boards</span><a class="more" href="#jobs">All jobs</a></div><div class="list">${topJobs.map(jobRow).join("")}</div></section>`;
@@ -597,7 +634,7 @@ function meetCard(m) {
       <div class="meta"><span>📍 ${esc(where(m))}</span>${m.format ? `<span class="pill soft">${esc(m.format)}</span>` : ""}${when(m)}${m.check ? '<span class="pill warn" title="These dates come from event listings or were announced as tentative. Confirm on the meeting website.">Check dates</span>' : ""}</div>
       ${m.note ? `<p class="mnote">${esc(m.note)}</p>` : ""}
       <div class="fdots">${famDots(m.fields)}</div>
-      <div class="mact"><a class="btn" href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">Website</a><button class="btn" data-ics="${esc(m.id)}">Add to calendar (.ics)</button><a class="btn" href="${esc(gcal(m))}" target="_blank" rel="noopener">Google Calendar</a></div>
+      <div class="mact"><a class="btn" href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">Website</a><button class="btn" data-ics="${esc(m.id)}">Add to calendar (.ics)</button><a class="btn" href="${esc(gcal(m))}" target="_blank" rel="noopener">Google Calendar</a><a class="btn" href="${esc(newThread("general", { title: `Going to ${m.short}?`, labels: "Conferences", body: `Who else is going to ${m.name} (${dateSpan(m)} ${fmt(m.start, { year: "numeric" })}, ${m.city})? Say hello, share your talk or poster, or plan a meet-up.` }))}" target="_blank" rel="noopener">Going? Meet others</a></div>
     </div></article>`;
 }
 function viewConferences() {
@@ -621,6 +658,49 @@ function viewConferences() {
     </div></div>`;
 }
 
+/* ---------- community ---------- */
+const FORUM = "https://github.com/continuum-news/continuum-news.github.io/discussions";
+const ROOMS = [...FAMILIES.map((f) => ({ label: f.label, color: f.color, about: f.blurb })),
+  { label: "Careers & jobs", color: "#0f766e", about: "Job hunting, grad school, skills and career advice" },
+  { label: "Conferences", color: "#db2777", about: "Meetings, abstracts, travel and meet-ups" }];
+const STARTS = [
+  { slug: "q-a", name: "Ask a question", emoji: "🙏", about: "Methods, software, field problems, papers you can't make sense of. Mark the reply that answered it." },
+  { slug: "show-and-tell", name: "Share your work", emoji: "🙌", about: "A paper, map, dataset, field photo, code or thesis. Tell people what you found." },
+  { slug: "general", name: "Start a conversation", emoji: "💬", about: "Anything Earth and planetary: news you want to discuss, collaborators you're looking for, a hello." },
+  { slug: "ideas", name: "Suggest an idea", emoji: "💡", about: "Sources, branches or features you'd like to see on The Continuum." },
+  { slug: "polls", name: "Run a poll", emoji: "🗳️", about: "Ask the community to vote: favourite field software, conference plans, anything." },
+];
+function newThread(slug, extra = {}) {
+  const q = new URLSearchParams({ category: slug, ...extra });
+  return `${FORUM}/new?${q}`;
+}
+const roomUrl = (label) => `${FORUM}?${new URLSearchParams({ discussions_q: `label:"${label}"` })}`;
+function threadRow(t) {
+  const labels = t.labels.map((l) => ROOMS.find((r) => r.label === l)).filter(Boolean);
+  return `<a class="thread" href="${esc(safeUrl(t.url))}" target="_blank" rel="noopener">
+    ${t.avatar ? `<img src="${esc(safeUrl(t.avatar))}" alt="" width="36" height="36" loading="lazy">` : '<span class="av"></span>'}
+    <div><b>${esc(t.title)}</b>${t.excerpt ? `<p>${esc(t.excerpt)}</p>` : ""}
+      <div class="tmeta"><span>${esc(t.emoji)} ${esc(t.category)}</span>${labels.map((r) => `<span class="tlab" style="--c:${r.color}">${esc(r.label)}</span>`).join("")}<span>${esc(t.author)} · ${ago(t.updated)}</span>${t.answered ? '<span class="pill live">Answered</span>' : ""}</div></div>
+    <div class="tcount"><b>${t.replies}</b><small>${t.replies === 1 ? "reply" : "replies"}</small>${t.votes ? `<small>▲ ${t.votes}</small>` : ""}</div></a>`;
+}
+function viewCommunity() {
+  const items = COMM.items || [];
+  const shown = items.filter((t) => !S.cfield || t.labels.includes(S.cfield));
+  return `<div class="comm">
+    <div class="comm-hero"><div><small>The Continuum community</small><h2>Talk Earth and planetary science with people who do it</h2>
+      <p>Ask questions, share your work, find collaborators and swap career advice with students, researchers and professionals in every branch, from groundwater to Mars.</p>
+      <div class="mact"><a class="btn primary" href="${esc(newThread("general"))}" target="_blank" rel="noopener">Start a discussion</a><a class="btn" href="${FORUM}" target="_blank" rel="noopener">Browse the forum</a></div>
+      <p class="fine">The forum runs on GitHub Discussions. Reading is open to everyone; posting needs a free GitHub account.</p></div></div>
+    <section><div class="sec-head"><h2>Start in the right place</h2></div><div class="starts">${STARTS.map((c) => `<a class="start" href="${esc(newThread(c.slug))}" target="_blank" rel="noopener"><span class="em">${c.emoji}</span><b>${esc(c.name)}</b><p>${esc(c.about)}</p></a>`).join("")}</div></section>
+    <section><div class="sec-head"><h2>Rooms by field</h2><span class="hint">Every thread can carry field labels; each room lists the threads with its label</span></div><div class="rooms">${ROOMS.map((r) => `<a class="room" style="--c:${r.color}" href="${esc(roomUrl(r.label))}" target="_blank" rel="noopener"><b>${esc(r.label)}</b><p>${esc(r.about)}</p><small>${items.filter((t) => t.labels.includes(r.label)).length} recent threads</small></a>`).join("")}</div></section>
+    <section><div class="sec-head"><h2>Latest threads</h2><span class="hint">${COMM.total ? `${COMM.total} in all · ` : ""}refreshed twice a day</span><a class="more" href="${FORUM}" target="_blank" rel="noopener">Open the forum</a></div>
+      ${items.length ? `<div class="bchips"><button class="bchip" style="--c:#0f766e" data-cfield="" aria-pressed="${!S.cfield}">All fields</button>${ROOMS.filter((r) => items.some((t) => t.labels.includes(r.label))).map((r) => `<button class="bchip" style="--c:${r.color}" data-cfield="${esc(r.label)}" aria-pressed="${S.cfield === r.label}">${esc(r.label)}</button>`).join("")}</div>` : ""}
+      ${shown.length ? `<div class="threads">${shown.map(threadRow).join("")}</div>` : `<div class="comm-empty"><b>${items.length ? "No threads in this field yet." : "The forum has just opened."}</b><p>Be the first: <a href="${esc(newThread("q-a"))}" target="_blank" rel="noopener">ask a question</a>, <a href="${esc(newThread("show-and-tell"))}" target="_blank" rel="noopener">share your work</a> or <a href="${esc(newThread("general", { title: "Hello from …", body: "Who I am, what I work on, and what I'd like to talk about:" }))}" target="_blank" rel="noopener">introduce yourself</a>.</p></div>`}
+    </section>
+    <section class="rules"><h3>House rules</h3><ul><li>Be kind and assume good faith. People here range from first-year students to emeritus professors.</li><li>Cite your sources and link the paper or data when you can.</li><li>Job posts are welcome in Careers &amp; jobs; adverts and self-promotion elsewhere are not.</li><li>No personal data about others, and nothing you wouldn't say at a conference poster.</li></ul></section>
+  </div>`;
+}
+
 /* ---------- choose themes ---------- */
 function editThemes() {
   const back = document.createElement("div"); back.className = "modal-back";
@@ -639,12 +719,12 @@ function editThemes() {
 }
 
 /* ---------- render + routing ---------- */
-const route = () => (["today", "branches", "news", "papers", "jobs", "conferences"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
+const route = () => (["today", "branches", "news", "papers", "jobs", "conferences", "community"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
 function render() {
   const r = route(), view = $("#view");
   const keep = document.activeElement?.id, pos = document.activeElement?.selectionStart;
   document.querySelectorAll("nav.tabs a").forEach((a) => a.setAttribute("aria-current", a.getAttribute("href") === `#${r}` ? "page" : "false"));
-  view.innerHTML = !NEWS.items.length && r !== "jobs" && r !== "conferences" ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "conferences" ? viewConferences() : r === "branches" ? viewBranches() : viewToday();
+  view.innerHTML = !NEWS.items.length && !["jobs", "conferences", "community"].includes(r) ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "conferences" ? viewConferences() : r === "community" ? viewCommunity() : r === "branches" ? viewBranches() : viewToday();
   paint(view);
   if (keep && document.getElementById(keep)) { const el = document.getElementById(keep); el.focus(); if (pos != null && el.setSelectionRange) el.setSelectionRange(pos, pos); }
 }
@@ -670,6 +750,7 @@ document.addEventListener("click", (e) => {
   else if (d.trend) { S.q = d.trend; S.theme = null; location.hash = "#news"; }
   else if (d.gotoTheme) { S.theme = d.gotoTheme; S.cat = null; }
   else if (d.editThemes !== undefined) editThemes();
+  else if (d.cfield !== undefined) { S.cfield = d.cfield || null; render(); }
   else if (d.mfield !== undefined) { S.mfield = d.mfield || null; render(); }
   else if (d.mregion) { S.mregion = d.mregion; render(); }
   else if (d.ics) { const m = MEET.items.find((x) => x.id === d.ics); if (m) saveIcs([m], `${m.id}.ics`); }
@@ -693,6 +774,7 @@ async function boot() {
   NEWS = embedded("news-data") || await fetch("news.json").then((r) => r.json()).catch(() => NEWS);
   JOBS = embedded("jobs-data") || await fetch("jobs.json").then((r) => r.json()).catch(() => JOBS);
   MEET = await fetch("conferences.json").then((r) => (r.ok ? r.json() : MEET)).catch(() => MEET);
+  COMM = await fetch("community.json").then((r) => (r.ok ? r.json() : COMM)).catch(() => COMM);
   CAT = Object.fromEntries((NEWS.categories || []).map((c) => [c.id, c]));
   ticker(); footer(); render();
 }

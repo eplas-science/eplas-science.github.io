@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   pages: write
+  discussions: read
   id-token: write
 
 concurrency:
@@ -32,6 +33,10 @@ jobs:
         run: python collector/news_collector.py site collector/heg_site.html
       - name: Make the site readable for search engines (headlines, robots.txt, sitemap)
         run: python collector/seo.py site
+      - name: Newest community threads (GitHub Discussions)
+        run: python collector/community.py site
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Prepare the site
         run: rm -rf site/publish && touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
