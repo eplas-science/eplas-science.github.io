@@ -452,6 +452,10 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
 .due.hot { color: #dc2626; }
 .soon.quiet { color: var(--faint); font-weight: 500; }
 .fund .cycle { margin-top: 4px; font-size: 12.5px; color: var(--faint); }
+.filters a.opt { text-decoration: none; }
+.filters .opt span .ic, .filters .opt > span > .ic { margin-right: 4px; color: var(--faint); }
+.mm b.clamp { font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.meet-mini .due { align-self: flex-start; }
 </style>
 
 <header class="top"><div class="wrap">
@@ -650,6 +654,9 @@ function viewToday() {
   html += `</div><p class="note">Showing ${S.mineThemes.size} of ${THEMES.length} branches. <button class="linkbtn" data-edit-themes>Choose your branches</button> · <a href="#branches">Explore all branches</a></p>`;
   const talk = (COMM.items || []).slice(0, 3);
   if (talk.length) html += `<section><div class="sec-head"><h2>From the community</h2><span class="hint">The latest conversations</span><a class="more" href="#community">Community</a></div><div class="threads">${talk.map(threadRow).join("")}</div></section>`;
+  const closing = [...recurring(), ...(FUND.items || [])].filter((f) => f.deadline && daysTo(f.deadline) >= 0 && daysTo(f.deadline) <= 45)
+    .sort((x, y) => x.deadline.localeCompare(y.deadline)).slice(0, 4);
+  if (closing.length) html += `<section><div class="sec-head"><h2>Closing soon</h2><span class="hint">Funding deadlines in the next six weeks</span><a class="more" href="#funding">All funding</a></div><div class="meet-strip">${closing.map((f) => { const a = agencyOf(f), d = daysTo(f.deadline); return `<a class="meet-mini" href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${logo({ logo: a.logo, short: a.short }, "sm")}<span class="mm"><b class="clamp">${esc(f.title)}</b><small>${esc(a.short)} · ${esc(f.type)} · ${esc(f.stage)}</small></span><span class="due${d <= 14 ? " hot" : ""}">${d === 0 ? "today" : `${d} d`}</span></a>`; }).join("")}</div></section>`;
   const soon = upcoming().slice(0, 4);
   if (soon.length) html += `<section><div class="sec-head"><h2>Coming up</h2><span class="hint">The next major meetings</span><a class="more" href="#conferences">All conferences</a></div><div class="meet-strip">${soon.map(meetMini).join("")}</div></section>`;
   if (topJobs.length) html += `<section><div class="sec-head"><h2>Jobs in these fields</h2><span class="hint">${JOBS.items.length} open positions from the AGU, Science and Chronicle job boards</span><a class="more" href="#jobs">All jobs</a></div><div class="list">${topJobs.map(jobRow).join("")}</div></section>`;
@@ -811,7 +818,7 @@ function viewConferences() {
   return `<div class="layout"><aside class="filters" aria-label="Conference filters">
       <div><h4>Field</h4><button class="opt" data-mfield="" aria-pressed="${!S.mfield}"><span>All fields</span><span class="n">${all.filter((m) => meetOk(m, "field")).length}</span></button>${FAMILIES.map((f) => `<button class="opt" data-mfield="${f.id}" aria-pressed="${S.mfield === f.id}"><span><i style="background:${f.color}"></i>${esc(f.label)}</span><span class="n">${all.filter((m) => meetOk(m, "field") && m.fields.includes(f.id)).length}</span></button>`).join("")}</div>
       <div><h4>Region</h4>${["All", ...REGIONS].map((r) => `<button class="opt" data-mregion="${esc(r)}" aria-pressed="${S.mregion === r}"><span>${r === "All" ? "Everywhere" : esc(r)}</span><span class="n">${all.filter((m) => meetOk(m, "region") && (r === "All" || m.region === r)).length}</span></button>`).join("")}</div>
-      <div><h4>Calendar</h4><button class="opt" data-ics-all><span>Add all ${list.length} to my calendar</span></button></div>
+      <div><h4>Calendar</h4><button class="opt" data-ics-all><span>${ic("cal", 14)} Download these ${list.length} meetings</span></button>${subscribe("conferences.ics", "meeting")}</div>
       ${confNews ? `<div><h4>News</h4><button class="opt" data-news-cat="conferences"><span>Calls for abstracts & meeting news</span><span class="n">${confNews}</span></button></div>` : ""}
     </aside><div>
     ${next ? nextUp(next) : ""}
@@ -820,6 +827,12 @@ function viewConferences() {
     <p class="note">Dates checked ${MEET.checked ? esc(fmt(MEET.checked, { day: "numeric", month: "long", year: "numeric" })) : ""} against the organisers' pages. Always confirm on the meeting website before booking travel.</p>
     </div></div>`;
 }
+
+/* ---------- calendar subscriptions ---------- */
+const FEED = (file) => `webcal://eplas-science.github.io/${file}`;
+const GFEED = (file) => `https://calendar.google.com/calendar/render?cid=${encodeURIComponent(FEED(file))}`;
+const subscribe = (file, what) => `<a class="opt" href="${FEED(file)}" title="Your calendar app adds every ${what} and keeps them up to date"><span>${ic("cal", 14)} Subscribe in my calendar app</span></a><a class="opt" href="${GFEED(file)}" target="_blank" rel="noopener"><span>${ic("ext", 14)} Subscribe in Google Calendar</span></a>`;
+const asIcs = (f) => ({ id: f.rec ? f.id : `grant-${f.id}`, name: `Deadline: ${f.title}`, org: f.agency, url: f.link, start: f.deadline, end: f.deadline });
 
 /* ---------- funding ---------- */
 const AGENCIES = [[/^NSF/, "NSF", "nsf"], [/^NASA/, "NASA", "nasa"], [/NOAA/, "NOAA", ""], [/USGS/, "USGS", "usgs"], [/^DOE|^PAMS/, "DOE", "doe"],
@@ -880,6 +893,7 @@ function viewFunding() {
       <div><h4>Field</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All fields</span></button>${FAMILIES.map((fm) => `<button class="opt" data-theme="fam:${fm.id}" aria-pressed="${S.theme === `fam:${fm.id}`}"><span><i style="background:${fm.color}"></i>${esc(fm.label)}</span><span class="n">${count("theme", (f) => famsOf(f).includes(fm.id))}</span></button>`).join("")}</div>
       <div><h4>From</h4>${opt("fagency", "All", "All agencies", count("agency", () => true))}${agencies.map((t) => opt("fagency", t, t, count("agency", (f) => agencyOf(f).short === t))).join("")}</div>
       <div><h4>Sort</h4>${opt("fsort", "deadline", "Deadline first", "")}${opt("fsort", "new", "Newest first", "")}</div>
+      <div><h4>Calendar</h4><button class="opt" data-fics-all><span>${ic("cal", 14)} Download these ${list.filter((f) => f.deadline).length} deadlines</span></button>${subscribe("deadlines.ics", "deadline")}</div>
     </aside><div>
     <div class="toolbar"><label class="search"><input id="fq" type="search" placeholder="Search funding: hydrology, Mars, postdoc, NSF…" value="${esc(S.fq)}" aria-label="Search funding"></label><span class="count">${list.length} opportunities</span></div>
     ${body || `<p class="empty">${all.length ? "Nothing matches. Try another type, stage, field or agency." : "Funding opportunities appear here after the next update."}</p>`}
@@ -986,6 +1000,7 @@ document.addEventListener("click", (e) => {
   else if (d.fstage) { S.fstage = d.fstage; render(); }
   else if (d.fagency) { S.fagency = d.fagency; render(); }
   else if (d.fsort) { S.fsort = d.fsort; render(); }
+  else if (d.ficsAll !== undefined) { saveIcs([...recurring(), ...(FUND.items || [])].filter((f) => f.deadline && fundOk(f)).map(asIcs), "eplas-deadlines.ics"); }
   else if (d.fics) { const f = FUND.items.find((x) => String(x.id) === d.fics); if (f) saveIcs([{ id: `grant-${f.id}`, name: `Deadline: ${f.title}`, org: f.agency, url: f.link, start: f.deadline, end: f.deadline }], `deadline-${f.id}.ics`); }
   else if (d.mfield !== undefined) { S.mfield = d.mfield || null; render(); }
   else if (d.mregion) { S.mregion = d.mregion; render(); }

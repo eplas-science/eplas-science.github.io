@@ -36,6 +36,8 @@ jobs:
         run: python collector/seo.py site
       - name: Open funding opportunities (Grants.gov)
         run: python collector/funding.py site
+      - name: Calendar feeds people can subscribe to
+        run: python collector/calendar_feeds.py site
       - name: Newest community threads (GitHub Discussions)
         run: python collector/community.py site
         env:
