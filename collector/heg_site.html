@@ -221,6 +221,9 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
 .modal-scroll h4 { margin: 12px 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
 .other-kind { margin-left: auto; font-weight: 600; color: #0f766e; text-decoration: none; white-space: nowrap; }
 .other-kind:hover { text-decoration: underline; }
+.pic .ph { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; padding: 14px 16px; background: color-mix(in srgb, var(--pc) 9%, #f7f5f0); border-bottom: 3px solid var(--pc); }
+.pic .ph span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pc); }
+.pic .ph b { font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: clamp(15px, 2vw, 22px); line-height: 1.15; color: #1f2733; font-weight: 650; }
 /* theme radar */
 .radar { display: flex; flex-direction: column; }
 .radar a, .radar button.rt { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); text-align: left; background: none; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
@@ -321,54 +324,14 @@ const themeName = (v) => (v.startsWith("fam:") ? FAM[v.slice(4)]?.label : TH[v]?
 const myScore = (i) => themesOf(i).filter((t) => S.mineThemes.has(t)).length;
 const color = (id) => CAT[id]?.color || "#0f766e";
 
-/* drawings for stories without a picture */
-function rng(seed) { let a = 0; for (const ch of seed) a = (a * 31 + ch.charCodeAt(0)) | 0; return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
-const PAL = {
-  nsg: ["#1e3a8a", "#2563eb", "#22d3ee", "#a3e635", "#facc15", "#f97316", "#dc2626"],
-  hydrology: ["#082f49", "#0c4a6e", "#0369a1", "#0ea5e9", "#7dd3fc"], water: ["#083344", "#155e75", "#0891b2", "#67e8f9", "#ecfeff"],
-  ecohydrology: ["#052e16", "#166534", "#16a34a", "#86efac", "#7dd3fc"], ecology: ["#14532d", "#15803d", "#65a30d", "#bef264", "#fef9c3"],
-  climate: ["#08306b", "#2171b5", "#6baed6", "#fcbba1", "#ef3b2c", "#67000d"], geoscience: ["#422006", "#78350f", "#a16207", "#d6b46a", "#e7d7b1", "#57534e"],
-  policy: ["#1e293b", "#334155", "#64748b", "#cbd5e1"], conferences: ["#500724", "#9d174d", "#db2777", "#fbcfe8"], awards: ["#451a03", "#b45309", "#f59e0b", "#fde68a"],
+/* Picture slot: the publisher's picture, or a clean card in the field's colour naming the field and source. */
+const pic = (i) => {
+  const f = FAM[familiesOf(i)[0]];
+  const label = f ? f.label : (CAT[i.category]?.label || (i.kind === "Paper" ? "Research paper" : "News"));
+  const c = f ? f.color : color(i.category);
+  return `<div class="pic" style="--pc:${c}"><div class="ph"><span>${esc(label)}</span><b>${esc(i.source || "")}</b></div>${safeUrl(i.image) ? `<img src="${esc(i.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</div>`;
 };
-function draw(cv) {
-  const id = cv.dataset.art, cat = cv.dataset.cat, r = rng(id), ctx = cv.getContext("2d"), W = cv.width, H = cv.height, p = PAL[cat] || PAL.geoscience;
-  const pick = () => p[Math.floor(r() * p.length)];
-  ctx.fillStyle = p[0]; ctx.fillRect(0, 0, W, H);
-  if (cat === "nsg") { // resistivity pseudosection: trapezoid of coloured cells over a smooth model
-    const cols = 26, rows = 9, cw = W / cols, ch = H / (rows + 1.5), cx = r() * cols, cy = 2 + r() * 4;
-    for (let y = 0; y < rows; y++) for (let x = y * 0.9; x < cols - y * 0.9; x++) {
-      const v = Math.sin(x / 4 + r() * 0.3) + Math.exp(-((x - cx) ** 2 + (y - cy) ** 2 * 3) / 18) * 2.2 + y * 0.12;
-      ctx.fillStyle = p[Math.max(0, Math.min(p.length - 1, Math.round((v + 1) * 1.6)))];
-      ctx.fillRect(x * cw, ch * 0.6 + y * ch, cw + 0.5, ch + 0.5);
-    }
-    ctx.fillStyle = "#e5e7eb"; for (let x = 0; x < cols; x += 2) ctx.fillRect(x * cw + cw / 2 - 1, ch * 0.25, 2, ch * 0.35);
-  } else if (cat === "climate") { // warming stripes
-    const n = 42; let v = -1 + r() * 0.4;
-    for (let k = 0; k < n; k++) { v += (r() - 0.38) * 0.22; const t = Math.max(0, Math.min(1, (v + 1) / 2 + k / n * 0.5)); ctx.fillStyle = p[Math.min(p.length - 1, Math.floor(t * p.length))]; ctx.fillRect(k * W / n, 0, W / n + 1, H); }
-  } else if (cat === "geoscience") { // strata
-    let y = 0; const tilt = (r() - 0.5) * 0.25;
-    while (y < H + 40) { const h = 8 + r() * 26; ctx.fillStyle = pick(); ctx.beginPath(); ctx.moveTo(0, y); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, y + Math.sin(x / 60 + y) * 4 + x * tilt); ctx.lineTo(W, H + 60); ctx.lineTo(0, H + 60); ctx.fill(); y += h; }
-  } else if (cat === "hydrology" || cat === "water") { // streamlines
-    for (let k = 0; k < 26; k++) { ctx.strokeStyle = pick(); ctx.globalAlpha = 0.55 + r() * 0.45; ctx.lineWidth = 1 + r() * 3; ctx.beginPath(); const y0 = r() * H, f = 0.01 + r() * 0.02, a = 8 + r() * 22; for (let x = -10; x <= W + 10; x += 6) ctx.lineTo(x, y0 + Math.sin(x * f + k) * a); ctx.stroke(); }
-    ctx.globalAlpha = 1;
-  } else if (cat === "ecohydrology") { // stems and roots across a ground line
-    const g = H * (0.55 + r() * 0.15); ctx.fillStyle = p[1]; ctx.fillRect(0, g, W, H - g);
-    const branch = (x, y, ang, len, w, dir) => { if (len < 6) return; const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len * dir; ctx.strokeStyle = dir < 0 ? p[3] : p[4]; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x2, y2); ctx.stroke(); branch(x2, y2, ang - 0.4 - r() * 0.3, len * 0.72, w * 0.7, dir); branch(x2, y2, ang + 0.4 + r() * 0.3, len * 0.72, w * 0.7, dir); };
-    for (let k = 0; k < 3; k++) { const x = W * (0.2 + k * 0.3 + (r() - 0.5) * 0.1); branch(x, g, -Math.PI / 2, H * 0.22, 5, 1); branch(x, g, -Math.PI / 2, H * 0.12, 3, -1); }
-  } else if (cat === "ecology") { // leaf venation dots
-    for (let k = 0; k < 140; k++) { ctx.fillStyle = pick(); ctx.globalAlpha = 0.4 + r() * 0.6; ctx.beginPath(); ctx.ellipse(r() * W, r() * H, 3 + r() * 14, 2 + r() * 7, r() * Math.PI, 0, Math.PI * 2); ctx.fill(); }
-    ctx.globalAlpha = 1;
-  } else if (cat === "conferences" || cat === "awards") { // rings / rays
-    const cx = W * (0.3 + r() * 0.4), cy = H * (0.3 + r() * 0.4);
-    for (let k = 14; k > 0; k--) { ctx.fillStyle = p[k % p.length]; ctx.beginPath(); ctx.arc(cx, cy, k * (W / 22), 0, Math.PI * 2); ctx.fill(); }
-  } else { // policy: a grid of blocks
-    for (let y = 0; y < H; y += 18) for (let x = 0; x < W; x += 18) { ctx.fillStyle = pick(); ctx.globalAlpha = 0.25 + r() * 0.75; ctx.fillRect(x + 2, y + 2, 14, 14); }
-    ctx.globalAlpha = 1;
-  }
-}
-const pic = (i, w = 320, h = 200) => `<div class="pic"><canvas data-art="${esc(i.id)}" data-cat="${esc(i.category)}" width="${w}" height="${h}" aria-hidden="true"></canvas>${safeUrl(i.image) ? `<img src="${esc(i.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</div>`;
 function paint(root) {
-  root.querySelectorAll("canvas[data-art]").forEach(draw);
   root.querySelectorAll(".pic img").forEach((img) => {
     const drop = () => img.remove();
     if (img.complete && !img.naturalWidth) drop(); else img.addEventListener("error", drop, { once: true });
@@ -541,7 +504,7 @@ function ticker() {
 function footer() {
   const ok = (NEWS.sources || []).filter((s) => s.ok).length;
   $("#foot").innerHTML = `<div>An informal, automatically updated digest of news, research papers and jobs from public feeds and job boards. Summaries are the publishers' own. Not affiliated with any university.</div>`
-    + `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} public news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards, twice a day. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; a drawing stands in where a story has none.</div>`
+    + `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} public news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards, twice a day. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; where a story has none, a card shows its field and source.</div>`
     + `<details><summary>Sources</summary><ul>${[...(NEWS.sources || []), ...(JOBS.sources || [])].map((s) => `<li>${esc(s.source)} ${s.ok ? `· ${s.count}` : "· unavailable"}</li>`).join("")}</ul></details>`;
 }
 

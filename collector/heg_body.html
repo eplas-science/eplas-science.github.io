@@ -50,6 +50,9 @@
 .modal-scroll h4 { margin: 12px 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
 .other-kind { margin-left: auto; font-weight: 600; color: #0f766e; text-decoration: none; white-space: nowrap; }
 .other-kind:hover { text-decoration: underline; }
+.pic .ph { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; padding: 14px 16px; background: color-mix(in srgb, var(--pc) 9%, #f7f5f0); border-bottom: 3px solid var(--pc); }
+.pic .ph span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pc); }
+.pic .ph b { font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: clamp(15px, 2vw, 22px); line-height: 1.15; color: #1f2733; font-weight: 650; }
 /* theme radar */
 .radar { display: flex; flex-direction: column; }
 .radar a, .radar button.rt { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); text-align: left; background: none; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
@@ -150,7 +153,19 @@ const themeName = (v) => (v.startsWith("fam:") ? FAM[v.slice(4)]?.label : TH[v]?
 const myScore = (i) => themesOf(i).filter((t) => S.mineThemes.has(t)).length;
 const color = (id) => CAT[id]?.color || "#0f766e";
 
-/*__ART__*/
+/* Picture slot: the publisher's picture, or a clean card in the field's colour naming the field and source. */
+const pic = (i) => {
+  const f = FAM[familiesOf(i)[0]];
+  const label = f ? f.label : (CAT[i.category]?.label || (i.kind === "Paper" ? "Research paper" : "News"));
+  const c = f ? f.color : color(i.category);
+  return `<div class="pic" style="--pc:${c}"><div class="ph"><span>${esc(label)}</span><b>${esc(i.source || "")}</b></div>${safeUrl(i.image) ? `<img src="${esc(i.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</div>`;
+};
+function paint(root) {
+  root.querySelectorAll(".pic img").forEach((img) => {
+    const drop = () => img.remove();
+    if (img.complete && !img.naturalWidth) drop(); else img.addEventListener("error", drop, { once: true });
+  });
+}
 
 /* ---------- pieces ---------- */
 function themeLine(i) {
@@ -318,7 +333,7 @@ function ticker() {
 function footer() {
   const ok = (NEWS.sources || []).filter((s) => s.ok).length;
   $("#foot").innerHTML = `<div>An informal, automatically updated digest of news, research papers and jobs from public feeds and job boards. Summaries are the publishers' own. Not affiliated with any university.</div>`
-    + `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} public news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards, twice a day. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; a drawing stands in where a story has none.</div>`
+    + `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} public news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards, twice a day. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; where a story has none, a card shows its field and source.</div>`
     + `<details><summary>Sources</summary><ul>${[...(NEWS.sources || []), ...(JOBS.sources || [])].map((s) => `<li>${esc(s.source)} ${s.ok ? `· ${s.count}` : "· unavailable"}</li>`).join("")}</ul></details>`;
 }
 

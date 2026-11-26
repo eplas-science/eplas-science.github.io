@@ -401,6 +401,40 @@ def classify(item):
     return main, cats, phd
 
 
+# Stories whose feed has no picture: use the picture the publisher sets for sharing (og:image),
+# read once per story. These publishers refuse automated page reads, so they are skipped.
+OG_SKIP = re.compile(r"sciencedirect\.com|onlinelibrary\.wiley\.com|agupubs\.|nature\.com|ipcc\.ch|noaa\.gov|volcano\.si\.edu|usgs\.gov|esa\.org", re.I)
+OG_RX = re.compile(r"""<meta[^>]+(?:property|name)=["'](?:og:image(?::secure_url)?|twitter:image(?::src)?)["'][^>]*content=["']([^"']+)|<meta[^>]+content=["']([^"']+)["'][^>]*(?:property|name)=["'](?:og:image|twitter:image)["']""", re.I)
+OG_PER_RUN = 300
+
+
+def og_image(url):
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html"})
+    with urllib.request.urlopen(req, timeout=10) as response:
+        page = response.read(300_000).decode("utf-8", "replace")
+    m = OG_RX.search(page)
+    found = html.unescape(m.group(1) or m.group(2)) if m else ""
+    return found if found.startswith("https://") else ""
+
+
+def add_share_images(items):
+    todo = [i for i in items if not i.get("image") and not i.get("imageTried") and not OG_SKIP.search(i["link"])][:OG_PER_RUN]
+    found = 0
+    with cf.ThreadPoolExecutor(16) as ex:
+        futures = {ex.submit(og_image, i["link"]): i for i in todo}
+        for f in cf.as_completed(futures):
+            item = futures[f]
+            item["imageTried"] = True
+            try:
+                url = f.result()
+            except Exception:  # unreachable page: keep the stand-in card
+                continue
+            if url:
+                item["image"] = url
+                found += 1
+    return found
+
+
 def norm(title):
     return re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
 
@@ -447,6 +481,7 @@ def main(out_dir, template=None):
         added += 1
     keep = [i for i in items.values() if parse_date(i["date"]) >= cutoff]
     keep.sort(key=lambda i: i["date"], reverse=True)
+    images_added = add_share_images(keep)
     data = {"updated": now.isoformat(timespec="minutes"), "added": added,
             "categories": [{"id": c, "label": l, "color": col} for c, l, col in CATEGORIES],
             "sources": sorted(status, key=lambda s: s["source"]), "items": keep}
@@ -461,7 +496,7 @@ def main(out_dir, template=None):
     (pub / "news.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     (pub / "jobs.json").write_text(json.dumps(jobs, ensure_ascii=False), encoding="utf-8")
     ok = sum(1 for s in status if s["ok"])
-    print(json.dumps({"ok": True, "added": added, "total": len(keep), "sources_ok": ok, "sources": len(status), "jobs": len(jobs["items"]), "jobs_added": jobs["added"], "updated": data["updated"]}))
+    print(json.dumps({"ok": True, "added": added, "total": len(keep), "sources_ok": ok, "sources": len(status), "jobs": len(jobs["items"]), "jobs_added": jobs["added"], "images_added": images_added, "updated": data["updated"]}))
 
 
 if __name__ == "__main__":
