@@ -30,6 +30,8 @@ jobs:
           curl -fsSL "$base/jobs.json" -o site/jobs.json || rm -f site/jobs.json
       - name: Collect news, papers and jobs
         run: python collector/news_collector.py site collector/heg_site.html
+      - name: Make the site readable for search engines (headlines, robots.txt, sitemap)
+        run: python collector/seo.py site
       - name: Prepare the site
         run: rm -rf site/publish && touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
