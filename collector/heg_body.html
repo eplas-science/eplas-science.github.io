@@ -49,7 +49,7 @@
 .meet-next small { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c); }
 .meet-next h2 { margin: 4px 0 2px; font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: clamp(20px, 3vw, 28px); }
 .meet-next p { margin: 0 0 8px; color: #4b5563; }
-.month h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: #6b7280; margin: 22px 0 8px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb; }
+.month > h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: #6b7280; margin: 22px 0 8px; padding-bottom: 6px; border-bottom: 1px solid #e5e7eb; }
 .meet { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 14px 0; border-bottom: 1px solid #eef0f3; }
 .mdate { text-align: center; border-radius: 12px; background: color-mix(in srgb, var(--c) 10%, white); color: var(--c); padding: 8px 4px; align-self: start; }
 .mdate b { display: block; font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: 22px; line-height: 1.05; }
@@ -384,8 +384,8 @@ const fmt = (iso, o) => utc(iso).toLocaleDateString(undefined, { timeZone: "UTC"
 const upcoming = () => (MEET.items || []).filter((m) => m.end >= todayISO()).sort((a, b) => a.start.localeCompare(b.start));
 const famDots = (ids) => ids.map((id) => FAM[id]).filter(Boolean).map((f) => `<span class="fdot" style="--c:${f.color}"><i></i>${esc(f.label)}</span>`).join("");
 function dateSpan(m) {
-  const sameMonth = m.start.slice(0, 7) === m.end.slice(0, 7);
-  return sameMonth ? `${fmt(m.start, { day: "numeric" })}–${fmt(m.end, { day: "numeric", month: "short" })}` : `${fmt(m.start, { day: "numeric", month: "short" })} – ${fmt(m.end, { day: "numeric", month: "short" })}`;
+  const d = (iso) => fmt(iso, { day: "numeric" }), mo = (iso) => fmt(iso, { month: "short" });
+  return m.start.slice(0, 7) === m.end.slice(0, 7) ? `${d(m.start)}–${d(m.end)} ${mo(m.start)}` : `${d(m.start)} ${mo(m.start)} – ${d(m.end)} ${mo(m.end)}`;
 }
 function when(m) {
   const t = todayISO();
