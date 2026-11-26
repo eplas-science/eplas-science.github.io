@@ -34,7 +34,7 @@ EMOJI = {":mega:": "📣", ":speech_balloon:": "💬", ":bulb:": "💡", ":ballo
 def fetch(token):
     body = json.dumps({"query": QUERY, "variables": {"owner": OWNER, "name": NAME}}).encode()
     req = urllib.request.Request("https://api.github.com/graphql", data=body, headers={
-        "Authorization": f"bearer {token}", "Content-Type": "application/json", "User-Agent": "continuum-community"})
+        "Authorization": f"bearer {token}", "Content-Type": "application/json", "User-Agent": "eplas-community"})
     with urllib.request.urlopen(req, timeout=30) as response:
         data = json.load(response)
     if data.get("errors"):

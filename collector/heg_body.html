@@ -1,17 +1,17 @@
-<title>The Continuum · news, papers and jobs</title>
+<title>EPLAS · Earth &amp; planetary science news, papers and jobs</title>
 <meta name="description" content="News, research papers and jobs across Earth and planetary science: geology, plate tectonics, volcanoes and earthquakes, hydrogeology, engineering geology, paleontology, ecology, geophysics, Mars and planetary geology, climate and policy. Updated twice a day.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://continuum-news.github.io/">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="The Continuum">
-<meta property="og:title" content="The Continuum · news, papers and jobs">
+<meta property="og:site_name" content="EPLAS">
+<meta property="og:title" content="EPLAS · Earth &amp; planetary science news, papers and jobs">
 <meta property="og:description" content="Earth and planetary science, from plate tectonics and fossils to groundwater and Mars: the day's news, new research papers and open jobs, updated twice a day.">
 <meta property="og:url" content="https://continuum-news.github.io/">
 <meta property="og:image" content="https://continuum-news.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="The Continuum · news, papers and jobs">
+<meta name="twitter:title" content="EPLAS · Earth &amp; planetary science news, papers and jobs">
 <meta name="twitter:description" content="Earth and planetary science: news, research papers and jobs, updated twice a day.">
 <meta name="twitter:image" content="https://continuum-news.github.io/og-image.png">
 <meta name="theme-color" content="#0f3b3a">
@@ -161,7 +161,7 @@
 </style>
 
 <header class="top"><div class="wrap">
-  <div class="brand"><h1>The <span>Continuum</span></h1><small>Earth &amp; planetary science · news, research papers and jobs</small></div>
+  <div class="brand"><h1><span>EPLAS</span></h1><small>Earth &amp; planetary science · news, research papers, jobs and conferences</small></div>
   <nav class="tabs" aria-label="Sections">
     <a href="#today">Today</a><a href="#branches">Branches</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a><a href="#conferences">Conferences</a><a href="#community">Community</a>
   </nav>
@@ -447,7 +447,7 @@ function ics(list) {
   const now = new Date().toISOString().replace(/[-:]/g, "").slice(0, 15) + "Z";
   const ev = list.map((m) => ["BEGIN:VEVENT", `UID:${m.id}@continuum-news.github.io`, `DTSTAMP:${now}`, `DTSTART;VALUE=DATE:${stamp(m.start)}`, `DTEND;VALUE=DATE:${stamp(nextDay(m.end))}`,
     `SUMMARY:${x(m.name)}`, `LOCATION:${x(where(m))}`, `DESCRIPTION:${x(`${m.org}\n${m.url}`)}`, `URL:${m.url}`, "END:VEVENT"].join("\r\n"));
-  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//The Continuum//Conferences//EN", "CALSCALE:GREGORIAN", ...ev, "END:VCALENDAR"].join("\r\n");
+  return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//EPLAS//Conferences//EN", "CALSCALE:GREGORIAN", ...ev, "END:VCALENDAR"].join("\r\n");
 }
 function saveIcs(list, name) {
   const a = document.createElement("a");
@@ -498,7 +498,7 @@ const STARTS = [
   { slug: "q-a", name: "Ask a question", emoji: "🙏", about: "Methods, software, field problems, papers you can't make sense of. Mark the reply that answered it." },
   { slug: "show-and-tell", name: "Share your work", emoji: "🙌", about: "A paper, map, dataset, field photo, code or thesis. Tell people what you found." },
   { slug: "general", name: "Start a conversation", emoji: "💬", about: "Anything Earth and planetary: news you want to discuss, collaborators you're looking for, a hello." },
-  { slug: "ideas", name: "Suggest an idea", emoji: "💡", about: "Sources, branches or features you'd like to see on The Continuum." },
+  { slug: "ideas", name: "Suggest an idea", emoji: "💡", about: "Sources, branches or features you'd like to see on EPLAS." },
   { slug: "polls", name: "Run a poll", emoji: "🗳️", about: "Ask the community to vote: favourite field software, conference plans, anything." },
 ];
 function newThread(slug, extra = {}) {
@@ -518,7 +518,7 @@ function viewCommunity() {
   const items = COMM.items || [];
   const shown = items.filter((t) => !S.cfield || t.labels.includes(S.cfield));
   return `<div class="comm">
-    <div class="comm-hero"><div><small>The Continuum community</small><h2>Talk Earth and planetary science with people who do it</h2>
+    <div class="comm-hero"><div><small>The EPLAS community</small><h2>Talk Earth and planetary science with people who do it</h2>
       <p>Ask questions, share your work, find collaborators and swap career advice with students, researchers and professionals in every branch, from groundwater to Mars.</p>
       <div class="mact"><a class="btn primary" href="${esc(newThread("general"))}" target="_blank" rel="noopener">Start a discussion</a><a class="btn" href="${FORUM}" target="_blank" rel="noopener">Browse the forum</a></div>
       <p class="fine">The forum runs on GitHub Discussions. Reading is open to everyone; posting needs a free GitHub account.</p></div></div>

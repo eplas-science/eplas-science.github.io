@@ -1,7 +1,7 @@
-# The Continuum
+# EPLAS: Earth & Planetary Science
 
-An informal, automatically updated digest of news, research papers and jobs in hydrology, soil science
-and environmental geophysics. Not affiliated with any university.
+EPLAS (Earth & Planetary Science) is an informal, automatically updated digest of news, research papers, jobs,
+conferences and community discussion across every branch of Earth and planetary science. Not affiliated with any university.
 
 News, research papers and jobs across these themes: soil moisture and salinity, coastal
 interfaces and flooding, wetlands and biogeochemistry, plants and trees, groundwater, contamination,
@@ -15,7 +15,7 @@ Summaries are the opening lines of each source's own article; every item links t
 LinkedIn, Indeed and Handshake do not allow other sites to collect their listings, so the Jobs page
 links to the same search on those sites instead.
 
-- Update now: Actions → "Update The Continuum" → Run workflow.
+- Update now: Actions → "Update EPLAS" → Run workflow.
 - Add a feed: append to `SOURCES` (news) or `JOB_BOARDS` / `JOB_QUERIES` (jobs) in the collector.
 - Headings: keyword rules are in `RULES`. Themes: `THEMES` in `collector/heg_body.html`; rebuild the
   page with `python collector/build_template.py <path to the shared news_site.html>`.
