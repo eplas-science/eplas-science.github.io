@@ -14,7 +14,7 @@ import shutil
 import sys
 from pathlib import Path
 
-BASE = "https://continuum-news.github.io/"
+BASE = "https://eplas-science.github.io/"
 here = Path(__file__).parent
 site = Path(sys.argv[1])
 now = dt.datetime.now(dt.timezone.utc)

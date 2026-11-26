@@ -26,7 +26,7 @@ jobs:
       - name: Start from the last published collection (keeps history and "New" labels)
         run: |
           mkdir -p site
-          base="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          base="https://${{ github.repository_owner }}.github.io"   # an <owner>.github.io repository is served at the root
           curl -fsSL "$base/news.json" -o site/news.json || rm -f site/news.json
           curl -fsSL "$base/jobs.json" -o site/jobs.json || rm -f site/jobs.json
       - name: Collect news, papers and jobs

@@ -11,7 +11,7 @@ import sys
 import urllib.request
 from pathlib import Path
 
-OWNER, NAME = "continuum-news", "continuum-news.github.io"
+OWNER, NAME = "eplas-science", "eplas-science.github.io"
 QUERY = """query($owner: String!, $name: String!) {
   repository(owner: $owner, name: $name) {
     discussionCategories(first: 25) { nodes { name slug emoji description isAnswerable } }

@@ -1,19 +1,19 @@
 <title>EPLAS · Earth &amp; planetary science news, papers and jobs</title>
 <meta name="description" content="News, research papers and jobs across Earth and planetary science: geology, plate tectonics, volcanoes and earthquakes, hydrogeology, engineering geology, paleontology, ecology, geophysics, Mars and planetary geology, climate and policy. Updated twice a day.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://continuum-news.github.io/">
+<link rel="canonical" href="https://eplas-science.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="EPLAS">
 <meta property="og:title" content="EPLAS · Earth &amp; planetary science news, papers and jobs">
 <meta property="og:description" content="Earth and planetary science, from plate tectonics and fossils to groundwater and Mars: the day's news, new research papers and open jobs, updated twice a day.">
-<meta property="og:url" content="https://continuum-news.github.io/">
-<meta property="og:image" content="https://continuum-news.github.io/og-image.png">
+<meta property="og:url" content="https://eplas-science.github.io/">
+<meta property="og:image" content="https://eplas-science.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="EPLAS · Earth &amp; planetary science news, papers and jobs">
 <meta name="twitter:description" content="Earth and planetary science: news, research papers and jobs, updated twice a day.">
-<meta name="twitter:image" content="https://continuum-news.github.io/og-image.png">
+<meta name="twitter:image" content="https://eplas-science.github.io/og-image.png">
 <meta name="theme-color" content="#0f3b3a">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -445,7 +445,7 @@ function gcal(m) {
 function ics(list) {
   const x = (t) => String(t).replace(/[\\;,]/g, (c) => `\\${c}`).replace(/\n/g, "\\n");
   const now = new Date().toISOString().replace(/[-:]/g, "").slice(0, 15) + "Z";
-  const ev = list.map((m) => ["BEGIN:VEVENT", `UID:${m.id}@continuum-news.github.io`, `DTSTAMP:${now}`, `DTSTART;VALUE=DATE:${stamp(m.start)}`, `DTEND;VALUE=DATE:${stamp(nextDay(m.end))}`,
+  const ev = list.map((m) => ["BEGIN:VEVENT", `UID:${m.id}@eplas-science.github.io`, `DTSTAMP:${now}`, `DTSTART;VALUE=DATE:${stamp(m.start)}`, `DTEND;VALUE=DATE:${stamp(nextDay(m.end))}`,
     `SUMMARY:${x(m.name)}`, `LOCATION:${x(where(m))}`, `DESCRIPTION:${x(`${m.org}\n${m.url}`)}`, `URL:${m.url}`, "END:VEVENT"].join("\r\n"));
   return ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//EPLAS//Conferences//EN", "CALSCALE:GREGORIAN", ...ev, "END:VCALENDAR"].join("\r\n");
 }
@@ -490,7 +490,7 @@ function viewConferences() {
 }
 
 /* ---------- community ---------- */
-const FORUM = "https://github.com/continuum-news/continuum-news.github.io/discussions";
+const FORUM = "https://github.com/eplas-science/eplas-science.github.io/discussions";
 const ROOMS = [...FAMILIES.map((f) => ({ label: f.label, color: f.color, about: f.blurb })),
   { label: "Careers & jobs", color: "#0f766e", about: "Job hunting, grad school, skills and career advice" },
   { label: "Conferences", color: "#db2777", about: "Meetings, abstracts, travel and meet-ups" }];
