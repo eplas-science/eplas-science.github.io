@@ -456,6 +456,7 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
 .filters .opt span .ic, .filters .opt > span > .ic { margin-right: 4px; color: var(--faint); }
 .mm b.clamp { font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .meet-mini .due { align-self: flex-start; }
+.meet-strip { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
 </style>
 
 <header class="top"><div class="wrap">
@@ -656,7 +657,7 @@ function viewToday() {
   if (talk.length) html += `<section><div class="sec-head"><h2>From the community</h2><span class="hint">The latest conversations</span><a class="more" href="#community">Community</a></div><div class="threads">${talk.map(threadRow).join("")}</div></section>`;
   const closing = [...recurring(), ...(FUND.items || [])].filter((f) => f.deadline && daysTo(f.deadline) >= 0 && daysTo(f.deadline) <= 45)
     .sort((x, y) => x.deadline.localeCompare(y.deadline)).slice(0, 4);
-  if (closing.length) html += `<section><div class="sec-head"><h2>Closing soon</h2><span class="hint">Funding deadlines in the next six weeks</span><a class="more" href="#funding">All funding</a></div><div class="meet-strip">${closing.map((f) => { const a = agencyOf(f), d = daysTo(f.deadline); return `<a class="meet-mini" href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${logo({ logo: a.logo, short: a.short }, "sm")}<span class="mm"><b class="clamp">${esc(f.title)}</b><small>${esc(a.short)} · ${esc(f.type)} · ${esc(f.stage)}</small></span><span class="due${d <= 14 ? " hot" : ""}">${d === 0 ? "today" : `${d} d`}</span></a>`; }).join("")}</div></section>`;
+  if (closing.length) html += `<section><div class="sec-head"><h2>Closing soon</h2><span class="hint">Funding deadlines in the next six weeks</span><a class="more" href="#funding">All funding</a></div><div class="meet-strip">${closing.map((f) => { const a = agencyOf(f), d = daysTo(f.deadline); return `<a class="meet-mini" href="${esc(safeUrl(f.link))}" target="_blank" rel="noopener">${logo({ logo: a.logo, short: a.short }, "sm")}<span class="mm"><b class="clamp">${esc(f.title)}</b><small>${esc(a.short)} · ${esc(f.stage === "Researchers & institutions" ? f.type : f.stage)}</small></span><span class="due${d <= 14 ? " hot" : ""}">${d === 0 ? "today" : `${d} d`}</span></a>`; }).join("")}</div></section>`;
   const soon = upcoming().slice(0, 4);
   if (soon.length) html += `<section><div class="sec-head"><h2>Coming up</h2><span class="hint">The next major meetings</span><a class="more" href="#conferences">All conferences</a></div><div class="meet-strip">${soon.map(meetMini).join("")}</div></section>`;
   if (topJobs.length) html += `<section><div class="sec-head"><h2>Jobs in these fields</h2><span class="hint">${JOBS.items.length} open positions from the AGU, Science and Chronicle job boards</span><a class="more" href="#jobs">All jobs</a></div><div class="list">${topJobs.map(jobRow).join("")}</div></section>`;
