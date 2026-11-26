@@ -1,0 +1,532 @@
+<title>The Continuum</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650;12..96,750&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a calm reading surface. One lead story with its picture, flowing rows (picture left, words right),
+   horizontal rails per heading, and a jobs board. Pictures come from each story; when a story has none
+   (or the page cannot load outside images) a small drawing of its field fills the frame. */
+:root {
+  --bg: #f3f5f4; --surface: #ffffff; --sunken: #e9eeec; --ink: #13201f; --muted: #5b6a67; --faint: #8a9794;
+  --line: #dbe2df; --accent: #0f766e; --accent-ink: #ffffff; --warm: #b45309; --band: #10201e; --band-ink: #e8f1ef;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0c1312; --surface: #131c1b; --sunken: #182423; --ink: #e5eeec; --muted: #9aaba7; --faint: #6f817d;
+  --line: #233230; --accent: #2dd4bf; --accent-ink: #062320; --warm: #f59e0b; --band: #060b0a; --band-ink: #e5eeec; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0c1312; --surface: #131c1b; --sunken: #182423; --ink: #e5eeec; --muted: #9aaba7; --faint: #6f817d;
+  --line: #233230; --accent: #2dd4bf; --accent-ink: #062320; --warm: #f59e0b; --band: #060b0a; --band-ink: #e5eeec; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); -webkit-font-smoothing: antialiased; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; letter-spacing: -0.01em; }
+.mono { font-family: var(--mono); font-size: 12px; }
+
+/* header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: 22px; padding-block: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; margin-right: auto; }
+.brand h1 { margin: 0; font-size: 24px; font-weight: 750; }
+.brand h1 span { color: var(--accent); }
+.brand small { color: var(--muted); font-size: 12.5px; }
+nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+nav.tabs a { padding: 7px 13px; border-radius: 999px; color: var(--muted); font-weight: 500; font-size: 14px; }
+nav.tabs a:hover { color: var(--ink); background: var(--sunken); }
+nav.tabs a[aria-current="page"] { background: var(--ink); color: var(--surface); }
+
+/* ticker */
+.ticker { background: var(--band); color: var(--band-ink); overflow: hidden; }
+.ticker .wrap { display: flex; align-items: center; gap: 14px; padding-block: 0; }
+.ticker .tag { flex: none; font: 500 11px var(--mono); letter-spacing: .12em; color: var(--accent); text-transform: uppercase; }
+.ticker .window { overflow: hidden; flex: 1; min-width: 0; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.ticker .track { display: flex; gap: 38px; width: max-content; padding-block: 9px; animation: tick var(--dur, 160s) linear infinite; }
+.ticker:hover .track { animation-play-state: paused; }
+.ticker a { display: inline-flex; gap: 8px; align-items: center; white-space: nowrap; font-size: 13.5px; }
+.ticker a:hover span.t { text-decoration: underline; text-underline-offset: 3px; }
+.ticker i { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.ticker em { font-style: normal; color: color-mix(in srgb, var(--band-ink) 55%, transparent); font-size: 12px; }
+@keyframes tick { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .ticker .track { animation: none; } .ticker .window { overflow-x: auto; } }
+
+main { padding-block: 22px 60px; display: flex; flex-direction: column; gap: 34px; }
+
+/* pictures */
+.pic { position: relative; overflow: hidden; border-radius: 10px; background: var(--sunken); aspect-ratio: 16 / 10; max-width: 100%; }
+.pic canvas, .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* lead + briefing */
+.lead { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+.lead .story { display: flex; flex-direction: column; gap: 12px; }
+.lead .story .pic { aspect-ratio: 16 / 9; border-radius: var(--radius); }
+.lead h2 { margin: 0; font-size: clamp(24px, 3.2vw, 34px); line-height: 1.12; font-weight: 700; }
+.lead p { margin: 0; color: var(--muted); font-size: 16px; max-width: 62ch; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--muted); }
+.meta .cat { font-weight: 600; color: var(--c, var(--accent)); }
+.pill { font: 500 11px var(--mono); padding: 2px 8px; border-radius: 999px; background: var(--sunken); color: var(--muted); }
+.pill.new { background: var(--accent); color: var(--accent-ink); }
+.pill.you { background: color-mix(in srgb, var(--warm) 16%, transparent); color: var(--warm); }
+.side { display: flex; flex-direction: column; gap: 18px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.panel h3 { margin: 0; font-size: 17px; font-weight: 650; display: flex; align-items: center; gap: 8px; }
+.panel .sub { color: var(--muted); font-size: 13px; margin: 0; }
+.brief { font-size: 14px; line-height: 1.6; }
+.brief p { margin: 0 0 8px; }
+.brief ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); padding: 7px 13px; border-radius: 999px; cursor: pointer; font-size: 13.5px; font-weight: 500; }
+.btn:hover { border-color: var(--faint); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn:disabled { opacity: .55; cursor: default; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 11px; font-size: 13px; cursor: pointer; display: inline-flex; gap: 7px; align-items: center; }
+.chip:hover { border-color: var(--faint); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.chip i { width: 8px; height: 8px; border-radius: 50%; }
+.chip .n { color: var(--faint); font: 400 11.5px var(--mono); }
+.chip[aria-pressed="true"] .n { color: inherit; opacity: .7; }
+.glance { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.glance div { display: flex; flex-direction: column; }
+.glance b { font: 650 24px var(--display); }
+.glance span { color: var(--muted); font-size: 12px; }
+
+/* section headings */
+.sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.sec-head h2 { margin: 0; font-size: 22px; font-weight: 650; }
+.sec-head .hint { color: var(--muted); font-size: 13px; }
+.sec-head a.more { margin-left: auto; color: var(--accent); font-weight: 500; font-size: 13.5px; }
+
+/* rails */
+.rail { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(230px, 1fr); gap: 18px; overflow-x: auto; padding-bottom: 6px; scroll-snap-type: x mandatory; scrollbar-width: thin; }
+.tile { display: flex; flex-direction: column; gap: 8px; scroll-snap-align: start; min-width: 0; }
+.tile h3 { margin: 0; font: 600 15.5px/1.3 var(--display); }
+.tile:hover h3, .row:hover h3, .lead .story:hover h2 { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.cat-band { display: flex; flex-direction: column; gap: 26px; }
+.cat-band section { padding-top: 18px; border-top: 1px solid var(--line); }
+.cat-band .sec-head h2::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--c); margin-right: 9px; vertical-align: 2px; }
+
+/* list layout (news, papers) */
+.layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 30px; align-items: start; }
+.filters { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 74px); display: flex; flex-direction: column; gap: 18px; }
+.filters h4 { margin: 0 0 6px; font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.filters .opt { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left; padding: 6px 10px; border-radius: 8px; border: 0; background: none; cursor: pointer; font-size: 14px; color: var(--muted); }
+.filters .opt:hover { background: var(--sunken); color: var(--ink); }
+.filters .opt[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); font-weight: 500; }
+.filters .opt i { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; display: inline-block; }
+.filters .opt .n { font: 400 11.5px var(--mono); color: var(--faint); }
+.search { display: flex; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px 4px 14px; }
+.search input { flex: 1; min-width: 0; border: 0; background: none; outline: none; color: var(--ink); font: inherit; padding: 6px 0; }
+.list { display: flex; flex-direction: column; }
+.row { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.row .pic { aspect-ratio: 16 / 11; }
+.row .body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.row h3 { margin: 0; font: 600 17.5px/1.28 var(--display); }
+.row p { margin: 0; color: var(--muted); font-size: 14px; }
+.row .actions { display: flex; gap: 8px; margin-top: 2px; flex-wrap: wrap; }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 500; }
+.explain { background: var(--sunken); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; color: var(--ink); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 6px; }
+.toolbar .search { flex: 1 1 280px; }
+.count { color: var(--muted); font-size: 13px; }
+.empty { padding: 40px 0; color: var(--muted); text-align: center; }
+
+/* jobs */
+.job { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.job .mark { width: 52px; height: 52px; border-radius: 12px; display: grid; place-items: center; font: 650 18px var(--display); color: #fff; }
+.job h3 { margin: 0; font: 600 17px/1.3 var(--display); }
+.job:hover h3 { text-decoration: underline; text-underline-offset: 3px; }
+.job .who { color: var(--ink); font-size: 14px; }
+.job p { margin: 4px 0 0; color: var(--muted); font-size: 13.5px; }
+.job .right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; text-align: right; }
+.fit { display: flex; gap: 3px; }
+.fit i { width: 7px; height: 16px; border-radius: 3px; background: var(--sunken); }
+.fit i.on { background: var(--accent); }
+.save { border: 0; background: none; cursor: pointer; font-size: 18px; line-height: 1; color: var(--faint); padding: 2px; }
+.save[aria-pressed="true"] { color: var(--warm); }
+.elsewhere { display: flex; flex-direction: column; gap: 10px; }
+.elsewhere .links { display: flex; flex-wrap: wrap; gap: 6px; }
+.elsewhere a { border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; background: var(--surface); }
+.elsewhere a:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ask */
+.ask { max-width: 760px; display: flex; flex-direction: column; gap: 14px; }
+.msgs { display: flex; flex-direction: column; gap: 14px; }
+.msg { padding: 12px 15px; border-radius: 14px; max-width: 90%; white-space: pre-wrap; font-size: 14.5px; }
+.msg.me { align-self: flex-end; background: var(--ink); color: var(--surface); }
+.msg.ai { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); }
+.ask form { display: flex; gap: 8px; }
+.ask textarea { flex: 1; min-width: 0; resize: vertical; min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; padding: 10px 12px; }
+.note { color: var(--muted); font-size: 13px; }
+
+footer { border-top: 1px solid var(--line); padding-block: 22px 40px; color: var(--muted); font-size: 12.5px; display: flex; flex-direction: column; gap: 8px; }
+footer details summary { cursor: pointer; }
+footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
+
+@media (max-width: 900px) {
+  .lead { grid-template-columns: 1fr; }
+  .layout { grid-template-columns: 1fr; }
+  .filters { position: static; flex-direction: row; flex-wrap: wrap; }
+  .filters > div { flex: 1 1 200px; }
+}
+@media (max-width: 560px) {
+  .row { grid-template-columns: 96px minmax(0, 1fr); gap: 12px; }
+  .row h3 { font-size: 15.5px; }
+  .job { grid-template-columns: 40px minmax(0, 1fr); }
+  .job .mark { width: 40px; height: 40px; font-size: 15px; }
+  .job .right { grid-column: 2; flex-direction: row; align-items: center; }
+  .brand small { display: none; }
+  .glance b { font-size: 20px; }
+}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="brand"><h1>The <span>Continuum</span></h1><small>News, papers and jobs from soil to atmosphere</small></div>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#today">Today</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a><a href="#ask">Ask</a>
+  </nav>
+</div></header>
+<div class="ticker" aria-label="Latest headlines"><div class="wrap"><span class="tag">Live</span><div class="window"><div class="track" id="ticker"></div></div></div></div>
+<main class="wrap" id="view"><p class="empty">Loading the latest stories…</p></main>
+<footer class="wrap" id="foot"></footer>
+
+<script id="news-data" type="application/json">/*__NEWS_DATA__*/null</script>
+<script id="jobs-data" type="application/json">/*__JOBS_DATA__*/null</script>
+<script>
+(() => {
+"use strict";
+const $ = (s, el = document) => el.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const safeUrl = (u) => (/^https:\/\//i.test(u || "") ? u : "");
+const store = {
+  get(k, d) { try { const v = localStorage.getItem("continuum." + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("continuum." + k, JSON.stringify(v)); } catch { /* private window */ } },
+};
+const embedded = (id) => { const t = (document.getElementById(id)?.textContent || "").trim(); if (!t || t.startsWith("/*")) return null; try { return JSON.parse(t); } catch { return null; } };
+
+let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, CAT = {};
+const DEFAULT_INTERESTS = ["electrical resistivity", "induced polarization", "self-potential", "sap flow", "tree", "soil moisture", "ecohydrology", "groundwater", "machine learning", "Lake Erie"];
+const S = { q: "", cat: null, days: 45, phd: false, jq: "", jtype: "All", jsort: "fit", savedOnly: false,
+  interests: store.get("interests", DEFAULT_INTERESTS), saved: new Set(store.get("saved", [])), explained: {} };
+let sample = null, sampleTools = false;
+
+/* ---------- helpers ---------- */
+const hours = (iso) => (Date.now() - new Date(iso).getTime()) / 36e5;
+const ago = (iso) => { const h = hours(iso); return h < 1 ? "just now" : h < 24 ? `${Math.round(h)} h ago` : h < 48 ? "yesterday" : h < 24 * 7 ? `${Math.round(h / 24)} days ago` : new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }); };
+const isNew = (i, data) => data.updated && i.firstSeen === data.updated && hours(i.date) < 72;
+const interestHits = (text) => S.interests.filter((w) => w && text.toLowerCase().includes(w.toLowerCase())).length;
+const youScore = (i) => interestHits(`${i.title} ${i.summary || ""}`) * 2 + (i.phd || 0);
+const color = (id) => CAT[id]?.color || "#0f766e";
+
+/* ---------- drawings for stories without a picture ---------- */
+function rng(seed) { let a = 0; for (const ch of seed) a = (a * 31 + ch.charCodeAt(0)) | 0; return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const PAL = {
+  nsg: ["#1e3a8a", "#2563eb", "#22d3ee", "#a3e635", "#facc15", "#f97316", "#dc2626"],
+  hydrology: ["#082f49", "#0c4a6e", "#0369a1", "#0ea5e9", "#7dd3fc"], water: ["#083344", "#155e75", "#0891b2", "#67e8f9", "#ecfeff"],
+  ecohydrology: ["#052e16", "#166534", "#16a34a", "#86efac", "#7dd3fc"], ecology: ["#14532d", "#15803d", "#65a30d", "#bef264", "#fef9c3"],
+  climate: ["#08306b", "#2171b5", "#6baed6", "#fcbba1", "#ef3b2c", "#67000d"], geoscience: ["#422006", "#78350f", "#a16207", "#d6b46a", "#e7d7b1", "#57534e"],
+  policy: ["#1e293b", "#334155", "#64748b", "#cbd5e1"], conferences: ["#500724", "#9d174d", "#db2777", "#fbcfe8"], awards: ["#451a03", "#b45309", "#f59e0b", "#fde68a"],
+};
+function draw(cv) {
+  const id = cv.dataset.art, cat = cv.dataset.cat, r = rng(id), ctx = cv.getContext("2d"), W = cv.width, H = cv.height, p = PAL[cat] || PAL.geoscience;
+  const pick = () => p[Math.floor(r() * p.length)];
+  ctx.fillStyle = p[0]; ctx.fillRect(0, 0, W, H);
+  if (cat === "nsg") { // resistivity pseudosection: trapezoid of coloured cells over a smooth model
+    const cols = 26, rows = 9, cw = W / cols, ch = H / (rows + 1.5), cx = r() * cols, cy = 2 + r() * 4;
+    for (let y = 0; y < rows; y++) for (let x = y * 0.9; x < cols - y * 0.9; x++) {
+      const v = Math.sin(x / 4 + r() * 0.3) + Math.exp(-((x - cx) ** 2 + (y - cy) ** 2 * 3) / 18) * 2.2 + y * 0.12;
+      ctx.fillStyle = p[Math.max(0, Math.min(p.length - 1, Math.round((v + 1) * 1.6)))];
+      ctx.fillRect(x * cw, ch * 0.6 + y * ch, cw + 0.5, ch + 0.5);
+    }
+    ctx.fillStyle = "#e5e7eb"; for (let x = 0; x < cols; x += 2) ctx.fillRect(x * cw + cw / 2 - 1, ch * 0.25, 2, ch * 0.35);
+  } else if (cat === "climate") { // warming stripes
+    const n = 42; let v = -1 + r() * 0.4;
+    for (let k = 0; k < n; k++) { v += (r() - 0.38) * 0.22; const t = Math.max(0, Math.min(1, (v + 1) / 2 + k / n * 0.5)); ctx.fillStyle = p[Math.min(p.length - 1, Math.floor(t * p.length))]; ctx.fillRect(k * W / n, 0, W / n + 1, H); }
+  } else if (cat === "geoscience") { // strata
+    let y = 0; const tilt = (r() - 0.5) * 0.25;
+    while (y < H + 40) { const h = 8 + r() * 26; ctx.fillStyle = pick(); ctx.beginPath(); ctx.moveTo(0, y); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, y + Math.sin(x / 60 + y) * 4 + x * tilt); ctx.lineTo(W, H + 60); ctx.lineTo(0, H + 60); ctx.fill(); y += h; }
+  } else if (cat === "hydrology" || cat === "water") { // streamlines
+    for (let k = 0; k < 26; k++) { ctx.strokeStyle = pick(); ctx.globalAlpha = 0.55 + r() * 0.45; ctx.lineWidth = 1 + r() * 3; ctx.beginPath(); const y0 = r() * H, f = 0.01 + r() * 0.02, a = 8 + r() * 22; for (let x = -10; x <= W + 10; x += 6) ctx.lineTo(x, y0 + Math.sin(x * f + k) * a); ctx.stroke(); }
+    ctx.globalAlpha = 1;
+  } else if (cat === "ecohydrology") { // stems and roots across a ground line
+    const g = H * (0.55 + r() * 0.15); ctx.fillStyle = p[1]; ctx.fillRect(0, g, W, H - g);
+    const branch = (x, y, ang, len, w, dir) => { if (len < 6) return; const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len * dir; ctx.strokeStyle = dir < 0 ? p[3] : p[4]; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x2, y2); ctx.stroke(); branch(x2, y2, ang - 0.4 - r() * 0.3, len * 0.72, w * 0.7, dir); branch(x2, y2, ang + 0.4 + r() * 0.3, len * 0.72, w * 0.7, dir); };
+    for (let k = 0; k < 3; k++) { const x = W * (0.2 + k * 0.3 + (r() - 0.5) * 0.1); branch(x, g, -Math.PI / 2, H * 0.22, 5, 1); branch(x, g, -Math.PI / 2, H * 0.12, 3, -1); }
+  } else if (cat === "ecology") { // leaf venation dots
+    for (let k = 0; k < 140; k++) { ctx.fillStyle = pick(); ctx.globalAlpha = 0.4 + r() * 0.6; ctx.beginPath(); ctx.ellipse(r() * W, r() * H, 3 + r() * 14, 2 + r() * 7, r() * Math.PI, 0, Math.PI * 2); ctx.fill(); }
+    ctx.globalAlpha = 1;
+  } else if (cat === "conferences" || cat === "awards") { // rings / rays
+    const cx = W * (0.3 + r() * 0.4), cy = H * (0.3 + r() * 0.4);
+    for (let k = 14; k > 0; k--) { ctx.fillStyle = p[k % p.length]; ctx.beginPath(); ctx.arc(cx, cy, k * (W / 22), 0, Math.PI * 2); ctx.fill(); }
+  } else { // policy: a grid of blocks
+    for (let y = 0; y < H; y += 18) for (let x = 0; x < W; x += 18) { ctx.fillStyle = pick(); ctx.globalAlpha = 0.25 + r() * 0.75; ctx.fillRect(x + 2, y + 2, 14, 14); }
+    ctx.globalAlpha = 1;
+  }
+}
+const pic = (i, w = 320, h = 200) => `<div class="pic"><canvas data-art="${esc(i.id)}" data-cat="${esc(i.category)}" width="${w}" height="${h}" aria-hidden="true"></canvas>${safeUrl(i.image) ? `<img src="${esc(i.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</div>`;
+function paint(root) {
+  root.querySelectorAll("canvas[data-art]").forEach(draw);
+  root.querySelectorAll(".pic img").forEach((img) => {
+    const drop = () => img.remove();
+    if (img.complete && !img.naturalWidth) drop(); else img.addEventListener("error", drop, { once: true });
+  });
+}
+
+/* ---------- pieces ---------- */
+function meta(i, data = NEWS) {
+  const c = CAT[i.category];
+  return `<div class="meta"><span class="cat" style="--c:${color(i.category)}">${esc(c?.label || "")}</span><span>${esc(i.source)}</span><span>${ago(i.date)}</span>${i.kind === "Paper" ? '<span class="pill">Paper</span>' : ""}${isNew(i, data) ? '<span class="pill new">New</span>' : ""}${youScore(i) >= 2 ? '<span class="pill you">For you</span>' : ""}</div>`;
+}
+const tile = (i) => `<a class="tile" href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener">${pic(i)}${meta(i)}<h3>${esc(i.title)}</h3></a>`;
+function row(i) {
+  const ex = S.explained[i.id];
+  return `<article class="row"><a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener">${pic(i, 336, 230)}</a><div class="body">${meta(i)}<a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener"><h3>${esc(i.title)}</h3></a>${i.summary ? `<p>${esc(i.summary)}</p>` : ""}`
+    + (sample ? `<div class="actions"><button class="linkbtn" data-explain="${esc(i.id)}">${ex ? "Hide explanation" : "Explain and relate to our work"}</button></div>${ex ? `<div class="explain">${esc(ex)}</div>` : ""}` : "") + `</div></article>`;
+}
+
+/* ---------- views ---------- */
+function trending() {
+  const stop = new Set("the a an of to in on for and with from by at as is are be its it this that new how why what study after over into could may can more than about amid says says' will has have their they our your who as us u.s. year years first one two three ai using reveal reveals revealed data framework global study studies based analysis approach model models modeling modelling impact impacts effect effects change changes research scientists researchers shows show find finds found driven during under across between toward towards through while when where which there these those some most other world people help helps".split(" "));
+  const counts = new Map();
+  for (const i of NEWS.items.filter((i) => hours(i.date) < 96)) {
+    const w = i.title.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((x) => x.length > 3 && !stop.has(x));
+    new Set([...w, ...w.slice(1).map((x, k) => `${w[k]} ${x}`)]).forEach((t) => counts.set(t, (counts.get(t) || 0) + 1));
+  }
+  const top = [...counts].filter(([t, n]) => n >= (t.includes(" ") ? 3 : 5)).sort((a, b) => b[1] - a[1] || b[0].length - a[0].length);
+  const out = [];
+  for (const [t] of top) { if (!out.some((o) => o.includes(t) || t.includes(o))) out.push(t); if (out.length >= 10) break; }
+  return out;
+}
+function viewToday() {
+  const items = NEWS.items;
+  const withPics = items.filter((i) => i.kind === "News" && i.summary && hours(i.date) < 72);
+  const lead = [...withPics].sort((a, b) => (youScore(b) - youScore(a)) || (!!b.image - !!a.image) || b.date.localeCompare(a.date))[0] || items[0];
+  const forYou = items.filter((i) => i !== lead && youScore(i) >= 2).sort((a, b) => youScore(b) - youScore(a) || b.date.localeCompare(a.date)).slice(0, 10);
+  const day = items.filter((i) => hours(i.date) < 24).length;
+  const jobsWeek = JOBS.items.filter((j) => hours(j.date) < 24 * 7).length;
+  const topJobs = [...JOBS.items].sort((a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date)).slice(0, 4);
+  let html = `<section class="lead">`;
+  if (lead) html += `<a class="story" href="${esc(safeUrl(lead.link))}" target="_blank" rel="noopener">${pic(lead, 960, 540)}${meta(lead)}<h2>${esc(lead.title)}</h2><p>${esc(lead.summary)}</p></a>`;
+  html += `<div class="side"><div class="panel"><h3>Today's briefing</h3>${briefingHtml()}</div>
+    <div class="panel"><h3>At a glance</h3><div class="glance"><div><b>${day}</b><span>stories in 24 h</span></div><div><b>${items.filter((i) => i.kind === "Paper" && hours(i.date) < 24 * 7).length}</b><span>papers this week</span></div><div><b>${jobsWeek}</b><span>new jobs this week</span></div></div>
+    <h3 style="margin-top:6px">Trending</h3><div class="chips">${trending().map((t) => `<button class="chip" data-trend="${esc(t)}">${esc(t)}</button>`).join("") || '<span class="note">Not enough stories yet.</span>'}</div></div></div></section>`;
+  if (forYou.length) html += `<section><div class="sec-head"><h2>For your research</h2><span class="hint">Matched to your interests: ${esc(S.interests.slice(0, 5).join(", "))}${S.interests.length > 5 ? "…" : ""}</span><a class="more" href="#settings-interests" data-edit-interests>Edit interests</a></div><div class="rail">${forYou.map(tile).join("")}</div></section>`;
+  html += `<div class="cat-band">`;
+  for (const c of NEWS.categories) {
+    const list = items.filter((i) => i.category === c.id && i !== lead).slice(0, 8);
+    if (list.length < 2) continue;
+    html += `<section style="--c:${c.color}"><div class="sec-head"><h2>${esc(c.label)}</h2><span class="hint">${items.filter((i) => i.tags.includes(c.id)).length} stories</span><a class="more" href="#news" data-goto-cat="${c.id}">See all</a></div><div class="rail">${list.map(tile).join("")}</div></section>`;
+  }
+  html += `</div>`;
+  if (topJobs.length) html += `<section><div class="sec-head"><h2>Jobs that fit</h2><span class="hint">${JOBS.items.length} open positions from the AGU, Science and Chronicle job boards</span><a class="more" href="#jobs">All jobs</a></div><div class="list">${topJobs.map(jobRow).join("")}</div></section>`;
+  return html;
+}
+function briefingHtml() {
+  if (S.brief) return `<div class="brief">${S.brief}</div><button class="linkbtn" data-brief="refresh">Write it again</button>`;
+  if (S.briefBusy) return `<p class="sub">Claude is reading today's ${NEWS.items.filter((i) => hours(i.date) < 48).length} stories…</p>`;
+  if (sample) return `<p class="sub">A short, plain summary of what matters today for soil, water, plant and geophysics research.</p><div><button class="btn primary" data-brief="go">Write today's briefing</button></div>${S.briefErr ? `<p class="note">${esc(S.briefErr)}</p>` : ""}`;
+  const top = NEWS.items.filter((i) => i.kind === "News" && i.summary && hours(i.date) < 48).sort((a, b) => youScore(b) - youScore(a)).slice(0, 4);
+  return `<ul class="brief">${top.map((i) => `<li><a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener"><b>${esc(i.title)}</b></a></li>`).join("")}</ul><p class="note">Open The Continuum inside Claude to have Claude write a briefing.</p>`;
+}
+function filtered(kind) {
+  const q = S.q.toLowerCase();
+  return NEWS.items.filter((i) => i.kind === kind && hours(i.date) <= S.days * 24 && (!S.cat || i.tags.includes(S.cat)) && (!S.phd || youScore(i) >= 2)
+    && (!q || `${i.title} ${i.summary} ${i.source}`.toLowerCase().includes(q)));
+}
+function viewList(kind) {
+  const base = NEWS.items.filter((i) => i.kind === kind && hours(i.date) <= S.days * 24);
+  const list = filtered(kind);
+  const opts = (arr) => arr.map(([v, label, n, c]) => `<button class="opt" data-cat="${v}" aria-pressed="${(S.cat || "") === v}"><span>${c ? `<i style="background:${c}"></i>` : ""}${esc(label)}</span><span class="n">${n}</span></button>`).join("");
+  const cats = [["", "Everything", base.length], ...NEWS.categories.map((c) => [c.id, c.label, base.filter((i) => i.tags.includes(c.id)).length, c.color]).filter((x) => x[2])];
+  const days = [[3, "Last 3 days"], [7, "This week"], [45, "Everything"]];
+  return `<div class="layout"><aside class="filters" aria-label="Filters">
+      <div><h4>Topic</h4>${opts(cats)}</div>
+      <div><h4>When</h4>${days.map(([d, l]) => `<button class="opt" data-days="${d}" aria-pressed="${S.days === d}"><span>${l}</span></button>`).join("")}</div>
+      <div><h4>Focus</h4><button class="opt" data-phd aria-pressed="${S.phd}"><span>Matches my interests</span></button></div>
+    </aside>
+    <div><div class="toolbar"><label class="search"><input id="q" type="search" placeholder="Search ${kind === "Paper" ? "papers" : "news"}…" value="${esc(S.q)}" aria-label="Search"></label><span class="count">${list.length} ${kind === "Paper" ? "papers" : "stories"}</span></div>
+    <div class="list">${list.slice(0, 120).map(row).join("") || '<p class="empty">Nothing matches. Try another topic or a wider time range.</p>'}</div></div></div>`;
+}
+
+/* jobs */
+const JOB_TYPES = ["All", "PhD & MS", "Postdoc", "Faculty", "Research staff", "Government", "Other"];
+const jobFit = (j) => j.match + interestHits(`${j.title} ${j.summary} ${j.employer}`) * 2;
+const initials = (s) => (s || "?").replace(/\b(of|the|and|at|for)\b/gi, "").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+const hue = (s) => { let h = 0; for (const c of s || "") h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+function jobRow(j) {
+  const fit = Math.min(5, Math.round(jobFit(j) / 1.5));
+  return `<article class="job"><div class="mark" style="background:hsl(${hue(j.employer)} 45% 38%)" aria-hidden="true">${esc(initials(j.employer))}</div>
+    <div><a href="${esc(safeUrl(j.link))}" target="_blank" rel="noopener"><h3>${esc(j.title)}</h3></a><div class="who">${esc(j.employer)}${j.location ? ` · ${esc(j.location)}` : ""}</div>
+    <div class="meta"><span class="pill">${esc(j.type)}</span>${j.salary ? `<span>${esc(j.salary)}</span>` : ""}<span>Posted ${ago(j.date)}</span><span>${esc(j.board)}</span>${isNew(j, JOBS) ? '<span class="pill new">New</span>' : ""}</div>
+    ${j.summary ? `<p>${esc(j.summary)}</p>` : ""}</div>
+    <div class="right"><button class="save" data-save="${esc(j.id)}" aria-pressed="${S.saved.has(j.id)}" aria-label="Save this job">${S.saved.has(j.id) ? "★" : "☆"}</button>
+    <div class="fit" title="How well it fits your interests">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= fit ? "on" : ""}"></i>`).join("")}</div></div></article>`;
+}
+function elsewhere() {
+  const q = S.jq || "hydrogeology";
+  const e = encodeURIComponent(q);
+  const links = [["LinkedIn", `https://www.linkedin.com/jobs/search/?keywords=${e}`], ["Indeed", `https://www.indeed.com/jobs?q=${e}`],
+    ["Handshake (UToledo login)", `https://app.joinhandshake.com/stu/postings?query=${e}`], ["USAJOBS", `https://www.usajobs.gov/search/results/?k=${e}`],
+    ["Google Jobs", `https://www.google.com/search?q=${encodeURIComponent(q + " jobs")}&ibp=htl;jobs`], ["HigherEdJobs", `https://www.higheredjobs.com/search/advanced_action.cfm?Keyword=${e}`]];
+  return `<div class="panel elsewhere"><h3>Search “${esc(q)}” on other job sites</h3><p class="sub">LinkedIn, Indeed and Handshake don't allow other sites to collect their listings, so these open the same search there.</p><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}</div></div>`;
+}
+function viewJobs() {
+  const q = S.jq.toLowerCase();
+  let list = JOBS.items.filter((j) => (S.jtype === "All" || j.type === S.jtype) && (!S.savedOnly || S.saved.has(j.id)) && (!q || `${j.title} ${j.employer} ${j.location} ${j.summary}`.toLowerCase().includes(q)));
+  list = list.sort(S.jsort === "fit" ? (a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date) : (a, b) => b.date.localeCompare(a.date));
+  const n = (t) => (t === "All" ? JOBS.items.length : JOBS.items.filter((j) => j.type === t).length);
+  return `<div class="layout"><aside class="filters" aria-label="Job filters">
+      <div><h4>Position</h4>${JOB_TYPES.map((t) => `<button class="opt" data-jtype="${esc(t)}" aria-pressed="${S.jtype === t}"><span>${esc(t)}</span><span class="n">${n(t)}</span></button>`).join("")}</div>
+      <div><h4>Sort</h4><button class="opt" data-jsort="fit" aria-pressed="${S.jsort === "fit"}"><span>Best fit first</span></button><button class="opt" data-jsort="new" aria-pressed="${S.jsort === "new"}"><span>Newest first</span></button></div>
+      <div><h4>Saved</h4><button class="opt" data-saved aria-pressed="${S.savedOnly}"><span>Only saved jobs</span><span class="n">${S.saved.size}</span></button></div>
+    </aside><div>
+    <div class="toolbar"><label class="search"><input id="jq" type="search" placeholder="Search jobs: hydrogeologist, postdoc, Ohio…" value="${esc(S.jq)}" aria-label="Search jobs"></label><span class="count">${list.length} jobs</span></div>
+    ${elsewhere()}
+    <div class="list">${list.slice(0, 150).map(jobRow).join("") || '<p class="empty">No jobs match. Try another search or position type.</p>'}</div></div></div>`;
+}
+
+/* ask */
+const chat = [];
+function viewAsk() {
+  if (!sample) return `<section class="ask"><div class="sec-head"><h2>Ask the desk</h2></div><p class="note">Asking Claude about the news and jobs works when this page is opened inside Claude (the claude.ai copy of The Continuum). Here you can search the News, Papers and Jobs tabs.</p></section>`;
+  return `<section class="ask"><div class="sec-head"><h2>Ask the desk</h2><span class="hint">Claude reads this week's stories, papers and jobs to answer. Each question uses your own Claude account.</span></div>
+    <div class="chips">${["What's new on tree water use and sap flow?", "Any recent papers using electrical resistivity or IP on plants or soils?", "Which postdocs fit hydrogeophysics?", "Summarise the COP31 outcome in three points"].map((s) => `<button class="chip" data-suggest="${esc(s)}">${esc(s)}</button>`).join("")}</div>
+    <div class="msgs" id="msgs">${chat.map((m) => `<div class="msg ${m.role === "user" ? "me" : "ai"}">${esc(m.content)}</div>`).join("")}</div>
+    <form id="askform"><textarea id="askbox" placeholder="Ask about the news, papers or jobs…" aria-label="Your question"></textarea><button class="btn primary" type="submit">Ask</button></form></section>`;
+}
+function searchData(query, kind) {
+  const words = String(query || "").toLowerCase().split(/\s+/).filter((w) => w.length > 2);
+  const score = (t) => words.reduce((s, w) => s + (t.toLowerCase().includes(w) ? 1 : 0), 0);
+  if (kind === "jobs") return JOBS.items.map((j) => [score(`${j.title} ${j.employer} ${j.summary} ${j.location} ${j.type}`), j]).filter(([s]) => s).sort((a, b) => b[0] - a[0]).slice(0, 12)
+    .map(([, j]) => ({ title: j.title, employer: j.employer, location: j.location, type: j.type, posted: j.date.slice(0, 10), link: j.link }));
+  return NEWS.items.map((i) => [score(`${i.title} ${i.summary} ${i.source}`), i]).filter(([s]) => s).sort((a, b) => b[0] - a[0]).slice(0, 12)
+    .map(([, i]) => ({ title: i.title, kind: i.kind, source: i.source, date: i.date.slice(0, 10), summary: (i.summary || "").slice(0, 300), link: i.link }));
+}
+const RULES = "You answer questions for a university research group (hydro-biogeochemistry and electrical geophysics: ERT, induced polarization and self-potential on soils and trees; ecohydrology; machine learning) about the news, research papers and job openings collected on their news page. Use the search tools to find items; answer briefly in plain text, name the source and date of each item you mention, and say when nothing relevant was found. Do not invent items or links.";
+async function ask(text) {
+  chat.push({ role: "user", content: text }, { role: "assistant", content: "Thinking…" });
+  render();
+  const bubble = () => [...document.querySelectorAll("#msgs .msg.ai")].pop();
+  const turns = chat.slice(0, -1).slice(-9);
+  const tools = sampleTools ? [
+    { name: "search_news", description: "Search the collected news stories and research papers by keywords. Returns up to 12 items with title, kind, source, date, summary and link.", inputSchema: { type: "object", properties: { query: { type: "string" } }, required: ["query"] }, execute: ({ query }) => searchData(query, "news") },
+    { name: "search_jobs", description: "Search the collected job openings by keywords. Returns up to 12 jobs with title, employer, location, type, posted date and link.", inputSchema: { type: "object", properties: { query: { type: "string" } }, required: ["query"] }, execute: ({ query }) => searchData(query, "jobs") },
+  ] : undefined;
+  const context = sampleTools ? "" : `\n\nRecent items:\n${NEWS.items.slice(0, 60).map((i) => `- ${i.title} (${i.source}, ${i.date.slice(0, 10)})`).join("\n")}\n\nJobs:\n${JOBS.items.slice(0, 40).map((j) => `- ${j.title}, ${j.employer} (${j.type})`).join("\n")}`;
+  try {
+    const { text: answer } = await sample([{ role: "user", content: RULES + context }, ...turns], { cache: false, tools, onText: ({ text: t }) => { chat[chat.length - 1].content = t; const b = bubble(); if (b) b.textContent = t; } });
+    chat[chat.length - 1].content = answer;
+  } catch (e) {
+    chat[chat.length - 1].content = e.text || errorText(e);
+    if (e.code === "not_granted" || e.code === "sampling_disabled") sample = null;
+  }
+  render();
+}
+const errorText = (e) => ({ not_granted: "Claude isn't allowed on this page for you. You can still browse everything.", rate_limited: "Too many questions at once. Try again in a minute.", session_expired: "Please sign in to Claude again." }[e.code] || "That didn't work. Try again in a moment.");
+
+async function writeBriefing(refresh) {
+  S.briefBusy = true; S.briefErr = ""; render();
+  const day = new Date().toISOString().slice(0, 10);
+  const items = NEWS.items.filter((i) => hours(i.date) < 48).slice(0, 70).map((i) => `- [${CAT[i.category]?.label}] ${i.title} (${i.source}${i.kind === "Paper" ? ", paper" : ""}): ${(i.summary || "").slice(0, 180)}`).join("\n");
+  const prompt = `Write today's (${day}) briefing for a university group working on soil, root, stem and atmosphere processes with electrical geophysics (ERT, IP, SP), hydrology, ecohydrology and machine learning. Use only these items. Give: one opening sentence on the day, then 4 to 6 bullet points, each naming the story and why it matters to this group in one plain sentence. Format: the opening sentence on its own line, then lines starting with "- ". No headings, no markdown other than the dashes.\n\n${items}`;
+  try {
+    const { text } = await sample(prompt, { modelTier: "default", cache: { gcTime: 6 * 3600 * 1000, refresh: !!refresh } });
+    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+    const intro = lines.filter((l) => !l.startsWith("-")).slice(0, 1).map((l) => `<p>${esc(l)}</p>`).join("");
+    S.brief = intro + `<ul>${lines.filter((l) => l.startsWith("-")).map((l) => `<li>${esc(l.replace(/^-\s*/, ""))}</li>`).join("")}</ul>`;
+  } catch (e) { S.briefErr = errorText(e); if (e.code === "not_granted") sample = null; }
+  S.briefBusy = false; render();
+}
+async function explain(id) {
+  if (S.explained[id]) { delete S.explained[id]; render(); return; }
+  const i = NEWS.items.find((x) => x.id === id); if (!i) return;
+  S.explained[id] = "Thinking…"; render();
+  try {
+    const { text } = await sample(`In 3 short plain sentences: what this ${i.kind === "Paper" ? "paper" : "story"} found, and how it could matter to research on soil-root-stem-atmosphere water and biogeochemistry using electrical geophysics (ERT, IP, SP) and machine learning. If it does not relate, say so in one sentence.\n\nTitle: ${i.title}\nSource: ${i.source}\nSummary: ${i.summary || "(no summary in the feed)"}`, { modelTier: "quick", cache: { gcTime: 24 * 3600 * 1000 } });
+    S.explained[id] = text;
+  } catch (e) { S.explained[id] = errorText(e); }
+  render();
+}
+
+/* ---------- interests ---------- */
+function editInterests() {
+  const box = document.createElement("div");
+  box.className = "panel"; box.style.cssText = "position:fixed;z-index:20;left:50%;top:20%;transform:translateX(-50%);width:min(520px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25)";
+  box.innerHTML = `<h3>Your interests</h3><p class="sub">Stories and jobs mentioning these get “For you” and rank first. One per line. Saved in this browser only.</p><textarea id="intbox" rows="8" style="width:100%;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;padding:10px">${esc(S.interests.join("\n"))}</textarea><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" data-int="cancel">Cancel</button><button class="btn primary" data-int="save">Save</button></div>`;
+  document.body.append(box);
+  box.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-int]"); if (!b) return;
+    if (b.dataset.int === "save") { S.interests = $("#intbox", box).value.split("\n").map((s) => s.trim()).filter(Boolean); store.set("interests", S.interests); }
+    box.remove(); render();
+  });
+}
+
+/* ---------- render + routing ---------- */
+const route = () => (["today", "news", "papers", "jobs", "ask"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
+function render() {
+  const r = route(), view = $("#view");
+  const keep = document.activeElement?.id, pos = document.activeElement?.selectionStart;
+  document.querySelectorAll("nav.tabs a").forEach((a) => a.setAttribute("aria-current", a.getAttribute("href") === `#${r}` ? "page" : "false"));
+  view.innerHTML = !NEWS.items.length && r !== "jobs" ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "ask" ? viewAsk() : viewToday();
+  paint(view);
+  if (keep && document.getElementById(keep)) { const el = document.getElementById(keep); el.focus(); if (pos != null && el.setSelectionRange) el.setSelectionRange(pos, pos); }
+  const m = $("#msgs"); if (m) m.lastElementChild?.scrollIntoView({ block: "nearest" });
+}
+function ticker() {
+  const top = NEWS.items.filter((i) => i.kind === "News").slice(0, 26);
+  const one = top.map((i) => `<a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener"><i style="background:${color(i.category)}"></i><span class="t">${esc(i.title)}</span><em>${esc(i.source)}</em></a>`).join("");
+  const t = $("#ticker"); t.innerHTML = one + one; t.style.setProperty("--dur", `${Math.max(80, top.length * 8)}s`);
+}
+function footer() {
+  const ok = (NEWS.sources || []).filter((s) => s.ok).length;
+  $("#foot").innerHTML = `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; a drawing stands in where a story has none or it cannot be shown here.</div>`
+    + `<details><summary>Sources</summary><ul>${[...(NEWS.sources || []), ...(JOBS.sources || [])].map((s) => `<li>${esc(s.source)} ${s.ok ? `· ${s.count}` : "· unavailable"}</li>`).join("")}</ul></details>`;
+}
+
+document.addEventListener("click", (e) => {
+  const t = e.target.closest("button, a"); if (!t) return;
+  const d = t.dataset;
+  if (d.cat !== undefined && t.classList.contains("opt")) { S.cat = d.cat || null; render(); }
+  else if (d.days) { S.days = +d.days; render(); }
+  else if (d.phd !== undefined) { S.phd = !S.phd; render(); }
+  else if (d.trend) { S.q = d.trend; location.hash = "#news"; }
+  else if (d.gotoCat) { S.cat = d.gotoCat; }
+  else if (d.editInterests !== undefined) { e.preventDefault(); editInterests(); }
+  else if (d.jtype) { S.jtype = d.jtype; render(); }
+  else if (d.jsort) { S.jsort = d.jsort; render(); }
+  else if (d.saved !== undefined) { S.savedOnly = !S.savedOnly; render(); }
+  else if (d.save) { S.saved.has(d.save) ? S.saved.delete(d.save) : S.saved.add(d.save); store.set("saved", [...S.saved]); render(); }
+  else if (d.explain) explain(d.explain);
+  else if (d.brief) writeBriefing(d.brief === "refresh");
+  else if (d.suggest) ask(d.suggest);
+});
+document.addEventListener("input", (e) => {
+  if (e.target.id === "q") { S.q = e.target.value; clearTimeout(S.t); S.t = setTimeout(render, 160); }
+  if (e.target.id === "jq") { S.jq = e.target.value; clearTimeout(S.t); S.t = setTimeout(render, 160); }
+});
+document.addEventListener("submit", (e) => {
+  if (e.target.id !== "askform") return;
+  e.preventDefault(); const v = $("#askbox").value.trim(); if (v) ask(v);
+});
+window.addEventListener("hashchange", () => { render(); window.scrollTo({ top: 0 }); });
+
+async function boot() {
+  NEWS = embedded("news-data") || await fetch("news.json").then((r) => r.json()).catch(() => NEWS);
+  JOBS = embedded("jobs-data") || await fetch("jobs.json").then((r) => r.json()).catch(() => JOBS);
+  CAT = Object.fromEntries((NEWS.categories || []).map((c) => [c.id, c]));
+  ticker(); footer(); render();
+  if (window.claude?.use) {
+    const s = await window.claude.use("sample").catch(() => null);
+    if (s) { sample = s; sampleTools = !!(await s.limits().catch(() => null))?.tools; render(); }
+  }
+}
+boot();
+})();
+</script>

@@ -1,0 +1,47 @@
+name: Update The Continuum
+
+on:
+  schedule:
+    - cron: "15 11,23 * * *"   # about 6:15 am and 6:15 pm in Toledo
+  workflow_dispatch:            # "Run workflow" button for an update now
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Start from the last published collection (keeps history and "New" labels)
+        run: |
+          mkdir -p site
+          base="https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
+          curl -fsSL "$base/news.json" -o site/news.json || rm -f site/news.json
+          curl -fsSL "$base/jobs.json" -o site/jobs.json || rm -f site/jobs.json
+      - name: Collect news, papers and jobs
+        run: python collector/news_collector.py site
+      - name: Prepare the site
+        run: rm -rf site/publish && touch site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
