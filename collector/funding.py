@@ -34,8 +34,8 @@ def earthy(title, summary):
 TYPES = [("Fellowship", r"fellow"), ("Scholarship", r"scholarship"), ("Prize & challenge", r"\bprize|challenge|competition"),
          ("Training & REU", r"research experiences? for undergraduates|\breu\b|internship|traineeship|training program"),
          ("Cooperative agreement", r"cooperative agreement|\bcesu\b")]
-STAGES = [("Students", r"undergraduate|graduate (?:student|research)|doctoral|dissertation|\bstudents?\b|\breu\b|trainee"),
-          ("Postdocs", r"post-?doc"), ("Early career", r"(?-i:\bCAREER\b)|early[- ]career|new investigator|young investigator|early-stage")]
+STAGES = [("Postdocs", r"post-?doc"),  # before Students: "postdoctoral" contains "doctoral"
+          ("Students", r"undergraduate|graduate (?:student|research)|\bdoctoral|dissertation|\bstudents?\b|\breu\b|trainee"), ("Early career", r"(?-i:\bCAREER\b)|early[- ]career|new investigator|young investigator|early-stage")]
 ROLLING_AFTER_YEARS = 5  # Grants.gov uses far-future close dates for programs that accept proposals any time
 # Left out: health agencies (they match words like "climate" or "hazard"), and USGS agreements that only the
 # existing partners of a Cooperative Ecosystem Studies Unit may apply for.
