@@ -25,7 +25,7 @@ t = np.linspace(0, 1, 120)
 ax.plot(9.6 + 0.25 * np.sin(t * 9), 3.05 - 2.6 * t, color="#e9c46a", alpha=0.55, linewidth=2.2)
 
 ax.text(0.85, 4.55, "The Continuum", color="white", fontsize=64, fontweight="bold", va="center", family="DejaVu Sans")
-ax.text(0.9, 3.65, "Hydrology · soil science · environmental geophysics", color="#cfe9e3", fontsize=24, va="center")
+ax.text(0.9, 3.65, "Earth & planetary science, from plate tectonics to Mars", color="#cfe9e3", fontsize=24, va="center")
 ax.text(0.9, 3.08, "News, research papers and jobs, updated twice a day", color="#9fd3c7", fontsize=19, va="center")
 ax.text(11.15, 0.32, "continuum-news.github.io", color="#9fd3c7", fontsize=15, ha="right", va="center")
 fig.savefig(out, dpi=100, facecolor=fig.get_facecolor())

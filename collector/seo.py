@@ -37,8 +37,9 @@ def row(item):
 static = (
     '<section id="seo-headlines" aria-label="Latest headlines" style="max-width:860px;margin:24px auto;padding:0 16px;font-family:system-ui,sans-serif">'
     "<h2>Latest news and research papers</h2>"
-    "<p>Hydrology, soil science, ecohydrology and environmental geophysics (ERT, induced polarization, self-potential, "
-    "electromagnetics, GPR), with climate, water management and environmental policy news and research jobs. "
+    "<p>Earth and planetary science: geology, mineralogy, plate tectonics, volcanoes and earthquakes, geomorphology, hydrology "
+    "and hydrogeology, engineering geology, paleontology and Earth history, ecology, geophysics and geochemistry, Mars and "
+    "planetary geology, climate and environmental policy, plus research jobs. "
     f"Updated twice a day; last update {now:%d %B %Y}.</p>"
     f"<ul>{''.join(row(item) for item in items)}</ul></section>"
     "<script>window.addEventListener('load',()=>{const s=document.getElementById('seo-headlines');if(s&&document.querySelector('main')&&!document.querySelector('main > .empty'))s.remove();});</script>"
