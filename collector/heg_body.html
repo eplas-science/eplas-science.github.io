@@ -158,7 +158,8 @@ const pic = (i) => {
   const f = FAM[familiesOf(i)[0]];
   const label = f ? f.label : (CAT[i.category]?.label || (i.kind === "Paper" ? "Research paper" : "News"));
   const c = f ? f.color : color(i.category);
-  return `<div class="pic" style="--pc:${c}"><div class="ph"><span>${esc(label)}</span><b>${esc(i.source || "")}</b></div>${safeUrl(i.image) ? `<img src="${esc(i.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</div>`;
+  const branch = themesOf(i).map((t) => TH[t]).find((t) => !f || t.family === f.id);
+  return `<div class="pic" style="--pc:${c}"><div class="ph"><span>${esc(label)}</span><b>${esc(branch ? branch.label : i.kind === "Paper" ? "Research paper" : "Science news")}</b></div>${safeUrl(i.image) ? `<img src="${esc(i.image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}</div>`;
 };
 function paint(root) {
   root.querySelectorAll(".pic img").forEach((img) => {
@@ -229,7 +230,8 @@ function viewToday() {
     const mine = THEMES.filter((t) => t.family === f.id && S.mineThemes.has(t.id));
     if (!mine.length) continue;
     const inMine = (i) => mine.some((t) => themesOf(i).includes(t.id));
-    const list = items.filter((i) => i !== lead && inMine(i)).slice(0, 10);
+    const pool = items.filter((i) => i !== lead && inMine(i)).slice(0, 30);
+    const list = [...pool.filter((i) => safeUrl(i.image)), ...pool.filter((i) => !safeUrl(i.image))].slice(0, 10);
     if (list.length < 2) continue;
     const chips = mine.map((t) => { const n = items.filter((i) => themesOf(i).includes(t.id)).length; return n ? `<button class="bchip" data-theme="${t.id}" data-go="news">${esc(t.label)} <span>${n}</span></button>` : ""; }).join("");
     html += `<section style="--c:${f.color}"><div class="sec-head"><h2>${esc(f.label)}</h2><span class="hint">${esc(f.blurb)}</span><a class="more" href="#news" data-goto-theme="fam:${f.id}">See all</a></div><div class="bchips">${chips}</div><div class="rail">${list.map(tile).join("")}</div></section>`;
