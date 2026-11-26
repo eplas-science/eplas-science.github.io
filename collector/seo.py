@@ -59,7 +59,7 @@ index.write_text(page, encoding="utf-8")
     "</urlset>\n",
     encoding="utf-8",
 )
-for name in ("og-image.png",):
+for name in ("og-image.png", "conferences.json"):
     if (here / name).exists():
         shutil.copy(here / name, site / name)
 # Search-engine ownership files (e.g. googleXXXX.html, BingSiteAuth.xml) kept in collector/verify/.
