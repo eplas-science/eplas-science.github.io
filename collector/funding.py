@@ -128,7 +128,7 @@ def main(site):
                 "id": h["id"], "number": h.get("number", ""), "title": clean(h["title"]), "agency": h.get("agency", ""),
                 "agencyCode": h.get("agencyCode", ""), "status": h.get("oppStatus", ""), "opened": str(mdy(h.get("openDate")) or ""),
                 "deadline": "" if rolling else close.isoformat(), "rolling": rolling,
-                "type": tag(TYPES, h["title"], "Grant"), "stage": tag(STAGES, text, "Researchers & institutions"),
+                "type": tag(TYPES, h["title"], "Grant"), "stage": tag(STAGES, h["title"], "") or tag(STAGES, text, "Researchers & institutions"),  # the title decides first
                 "link": f"https://www.grants.gov/search-results-detail/{h['id']}",
                 "firstSeen": old.get(h["id"], {}).get("firstSeen") or out["updated"], **extra})
         items.sort(key=lambda i: (i["rolling"], i["deadline"] or "9999"))
