@@ -1,18 +1,18 @@
 <title>The Continuum · news, papers and jobs</title>
-<meta name="description" content="News, research papers and jobs in hydrology, soil science, ecohydrology and environmental geophysics (ERT, IP, SP, EM, GPR), plus climate, water and environmental policy. Updated twice a day.">
+<meta name="description" content="News, research papers and jobs across Earth and planetary science: geology, plate tectonics, volcanoes and earthquakes, hydrogeology, engineering geology, paleontology, ecology, geophysics, Mars and planetary geology, climate and policy. Updated twice a day.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://continuum-news.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="The Continuum">
 <meta property="og:title" content="The Continuum · news, papers and jobs">
-<meta property="og:description" content="Hydrology, soil science and environmental geophysics: the day's news, new research papers and open jobs, updated twice a day.">
+<meta property="og:description" content="Earth and planetary science, from plate tectonics and fossils to groundwater and Mars: the day's news, new research papers and open jobs, updated twice a day.">
 <meta property="og:url" content="https://continuum-news.github.io/">
 <meta property="og:image" content="https://continuum-news.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The Continuum · news, papers and jobs">
-<meta name="twitter:description" content="Hydrology, soil science and environmental geophysics: news, papers and jobs, updated twice a day.">
+<meta name="twitter:description" content="Earth and planetary science: news, research papers and jobs, updated twice a day.">
 <meta name="twitter:image" content="https://continuum-news.github.io/og-image.png">
 <meta name="theme-color" content="#0f3b3a">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,6 +21,33 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650;12..96,750&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 /*__CSS__*/
+/* fields and branches */
+.atlas-intro { margin: 8px 0 18px; }
+.atlas-intro h2 { margin: 0 0 6px; font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: clamp(24px, 3vw, 34px); }
+.atlas-intro p { margin: 0; color: #5b6472; max-width: 70ch; }
+.atlas { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.field { background: #fff; border: 1px solid #e6e8ec; border-top: 4px solid var(--c); border-radius: 14px; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+.field header { display: flex; gap: 10px; align-items: flex-start; }
+.field header .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--c); margin-top: 7px; flex: none; }
+.field header div { flex: 1; }
+.field h3 { margin: 0; font-family: "Bricolage Grotesque", Inter, sans-serif; font-size: 20px; }
+.field header p { margin: 2px 0 0; color: #5b6472; font-size: 13.5px; }
+.count-btn { border: none; background: color-mix(in srgb, var(--c) 12%, white); color: var(--c); font-weight: 650; border-radius: 999px; padding: 4px 11px; cursor: pointer; font: inherit; font-weight: 650; }
+.branches { display: flex; flex-direction: column; gap: 4px; }
+.branch { display: flex; justify-content: space-between; gap: 10px; border: 1px solid transparent; background: #f7f8fa; border-radius: 9px; padding: 8px 11px; cursor: pointer; font: inherit; color: #1f2733; text-align: left; }
+.branch:hover { border-color: var(--c); background: color-mix(in srgb, var(--c) 7%, white); }
+.branch .n { color: #8a93a3; font-variant-numeric: tabular-nums; }
+.field-top { display: block; border-top: 1px dashed #e1e4ea; padding-top: 10px; color: #1f2733; text-decoration: none; font-size: 14px; line-height: 1.4; }
+.field-top small { display: block; color: var(--c); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 11px; margin-bottom: 2px; }
+.field-top:hover { color: var(--c); }
+.bchips { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 12px; }
+.bchip { border: 1px solid color-mix(in srgb, var(--c) 35%, white); background: color-mix(in srgb, var(--c) 7%, white); color: #1f2733; border-radius: 999px; padding: 4px 11px; font: inherit; font-size: 13px; cursor: pointer; }
+.bchip span { color: var(--c); font-weight: 600; margin-left: 2px; }
+.bchip:hover { background: color-mix(in srgb, var(--c) 15%, white); }
+.opt.fam { font-weight: 600; margin-top: 6px; }
+.opt.sub { padding-left: 26px; font-size: 13.5px; }
+.modal-scroll { max-height: 60vh; overflow: auto; padding-right: 4px; }
+.modal-scroll h4 { margin: 12px 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
 /* theme radar */
 .radar { display: flex; flex-direction: column; }
 .radar a, .radar button.rt { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); text-align: left; background: none; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
@@ -39,9 +66,9 @@
 </style>
 
 <header class="top"><div class="wrap">
-  <div class="brand"><h1>The <span>Continuum</span></h1><small>Hydrology, soil science and environmental geophysics · news, papers and jobs</small></div>
+  <div class="brand"><h1>The <span>Continuum</span></h1><small>Earth &amp; planetary science · news, research papers and jobs</small></div>
   <nav class="tabs" aria-label="Sections">
-    <a href="#today">Today</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a>
+    <a href="#today">Today</a><a href="#branches">Branches</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a>
   </nav>
 </div></header>
 <div class="ticker" aria-label="Latest headlines"><div class="wrap"><span class="tag">Live</span><div class="window"><div class="track" id="ticker"></div></div></div></div>
@@ -62,29 +89,62 @@ const store = {
 };
 const embedded = (id) => { const t = (document.getElementById(id)?.textContent || "").trim(); if (!t || t.startsWith("/*")) return null; try { return JSON.parse(t); } catch { return null; } };
 
-/* Research themes. Every story, paper and job is matched against these keywords. */
-const THEMES = [
-  { id: "moisture", label: "Soil moisture & salinity", color: "#0284c7", rx: /soil moisture|water content|moisture content|salinit|saline|\bsalt|vadose|unsaturated|infiltration|soil water|evapotranspiration/i },
-  { id: "coastal", label: "Coastal interfaces & flooding", color: "#0f766e", rx: /coast|estuar|shoreline|lake erie|great lakes|chesapeake|flood|storm surge|terrestrial.aquatic|land.lake|sea.level|saltwater|tidal/i },
-  { id: "wetlands", label: "Wetlands & biogeochemistry", color: "#65a30d", rx: /wetland|marsh|peat|biogeochem|redox|oxygen|nitrate|nitrogen|phosph|methane|nutrient|carbon cycl|soil carbon|microb/i },
-  { id: "plants", label: "Plants, roots & trees", color: "#16a34a", rx: /\btrees?\b|forest|\broots?\b|\bstems?\b|sap ?flow|xylem|transpiration|plant water|canopy|vegetation|crop/i },
-  { id: "groundwater", label: "Groundwater & aquifers", color: "#4f46e5", rx: /groundwater|aquifer|recharge|hydrogeolog|water table|karst|hydraulic conductiv|well field|drinking water/i },
-  { id: "contaminants", label: "Contamination & remediation", color: "#b45309", rx: /contamin|pollut|oil spill|crude oil|\bpfas\b|remediat|heavy metal|plume|toxic|leachate|landfill/i },
-  { id: "forensic", label: "Archaeology & forensics", color: "#9f1239", rx: /archaeolog|forensic|\bgraves?\b|burial|buried object|cultural heritage|cemetery|clandestine/i },
-  { id: "methods", label: "Geophysical methods & ML", color: "#7c3aed", rx: /resistivit|\bERT\b|induced polari|self[- ]potential|electromagnet|ground[- ]penetrating|\bGPR\b|seismic|geophysic|tomograph|inversion|machine learning|deep learning|neural network|geoelectric/i },
+/* Fields and branches of Earth and planetary science. Every story, paper and job is matched
+   against the branch keywords (title, summary and source); one item can sit in several branches. */
+const FAMILIES = [
+  { id: "solid", label: "Solid Earth", color: "#b45309", blurb: "Rocks, minerals, plates, volcanoes and earthquakes" },
+  { id: "surface", label: "Surface & water", color: "#0284c7", blurb: "Landscapes, rivers, groundwater, soils, coasts, ice and hazards" },
+  { id: "history", label: "Earth history & life", color: "#be123c", blurb: "Deep time, fossils, past climates and living systems" },
+  { id: "planetary", label: "Planetary", color: "#4338ca", blurb: "Mars, the Moon and the rest of the Solar System" },
+  { id: "applied", label: "Methods & applied", color: "#7c3aed", blurb: "Geophysics, geochemistry, data, resources and the environment" },
+  { id: "climate", label: "Climate & policy", color: "#dc2626", blurb: "A changing climate and the decisions around it" },
 ];
+const THEMES = [
+  { id: "petrology", family: "solid", label: "Mineralogy & petrology", rx: /mineral(?!s? resource)|petrolog|igneous|metamorph|granit|basalt|crystal|zircon|magmatic/i },
+  { id: "tectonics", family: "solid", label: "Plate tectonics & structure", rx: /tecton|subduct|plate boundar|\brift|\bfaults?\b|orogen|mountain[- ]building|lithosphere|\bmantle\b|\bcrust|geodynamic|supercontinent/i },
+  { id: "volcanology", family: "solid", label: "Volcanology", rx: /volcan|eruption|\blava\b|magma|caldera|pyroclast|tephra/i },
+  { id: "seismology", family: "solid", label: "Earthquakes & seismology", rx: /earthquake|seism|tsunami|aftershock|^M \d\.\d|magnitude \d/i },
+  { id: "geomorphology", family: "surface", label: "Geomorphology & landscapes", rx: /geomorph|landscape|erosion|landform|weathering|sediment transport|\bdunes?\b|\bkarst|river (?:channel|delta)|earth surface/i },
+  { id: "hydro", family: "surface", label: "Hydrology & hydrogeology", rx: /groundwater|aquifer|hydrogeolog|hydrolog|streamflow|recharge|watershed|catchment|\brivers?\b|drought|flood/i },
+  { id: "soils", family: "surface", label: "Soils & critical zone", rx: /\bsoils?\b|soil moisture|critical zone|vadose|regolith|pedolog|peat/i },
+  { id: "engineering", family: "surface", label: "Engineering geology & hazards", rx: /engineering geolog|geotechn|landslide|slope (?:stability|failure)|subsidence|sinkhole|liquefaction|rockfall|debris flow|geohazard|natural hazard|\btunnel/i },
+  { id: "oceans", family: "surface", label: "Oceans & coasts", rx: /\bocean|marine|seafloor|sea floor|\bcoast|estuar|sea[- ]level|coral|tidal|shoreline/i },
+  { id: "cryosphere", family: "surface", label: "Ice & permafrost", rx: /glacier|ice sheet|ice shelf|permafrost|sea ice|snowpack|antarctic|greenland|\barctic/i },
+  { id: "deeptime", family: "history", label: "Historical geology & stratigraphy", rx: /stratigraph|historical geolog|geologic(?:al)? (?:time|record)|precambrian|cambrian|ordovician|devonian|carboniferous|permian|triassic|jurassic|cretaceous|paleogene|eocene|miocene|pleistocene|holocene|archean|proterozoic|mass extinction|deep time|million years ago|billion years/i },
+  { id: "paleontology", family: "history", label: "Paleontology & fossils", rx: /fossil|paleontolog|palaeontolog|dinosaur|ammonite|trilobite|pterosaur|paleobiolog|extinct/i },
+  { id: "paleoclimate", family: "history", label: "Past climates", rx: /paleoclimat|palaeoclimat|ice core|ice age|glacial (?:period|maximum|cycle)|interglacial|sediment core|climate of the past|palaeo/i },
+  { id: "ecology", family: "history", label: "Ecology & ecosystems", rx: /ecolog|ecosystem|biodiversity|\bspecies|habitat|wildlife|forest|wetland|\btrees?\b|\bplants?\b|vegetation/i },
+  { id: "biogeochem", family: "history", label: "Biogeochemistry", rx: /biogeochem|carbon cycle|nitrogen|phosph|methane|redox|nutrient|microb/i },
+  { id: "mars", family: "planetary", label: "Mars", rx: /\bmars\b|martian|perseverance|curiosity rover|jezero|gale crater/i },
+  { id: "moon", family: "planetary", label: "The Moon", rx: /\bthe moon\b|\bmoon's|lunar|artemis/i },
+  { id: "planets", family: "planetary", label: "Planets, asteroids & the Solar System", rx: /planetary|planet|asteroid|comet|meteor|solar system|\bvenus\b|jupiter|saturn|europa|enceladus|\btitan\b|icy moon|impact crater|icarus|exoplanet/i },
+  { id: "geophysics", family: "applied", label: "Geophysics", rx: /geophysic|resistivit|\bERT\b|induced polari|self[- ]potential|electromagnet|ground[- ]penetrating|\bGPR\b|seismic (?:imaging|survey|reflection|refraction|tomograph)|gravity (?:survey|anomal)|magnetotelluric|geoelectric|tomograph/i },
+  { id: "geochem", family: "applied", label: "Geochemistry & dating", rx: /geochem|isotop|geochronolog|radiometric|trace element|chemical geology/i },
+  { id: "data", family: "applied", label: "Remote sensing, GIS & AI", rx: /remote sensing|satellite|lidar|\bInSAR\b|\bGIS\b|machine learning|deep learning|neural network|artificial intelligence|\bAI\b|digital twin/i },
+  { id: "resources", family: "applied", label: "Resources & energy", rx: /mineral resource|\bmining|\bmines?\b|\bores?\b|critical mineral|lithium|rare earth|geotherm|\boil\b|natural gas|hydrogen|carbon (?:capture|storage)|\bCCS\b/i },
+  { id: "environment", family: "applied", label: "Environmental geology & pollution", rx: /contamin|pollut|\bPFAS\b|remediat|heavy metal|\bplume|toxic|microplastic|landfill|leachate|oil spill/i },
+  { id: "climatechange", family: "climate", label: "Climate change", rx: /climate|global warming|greenhouse|emission|heat ?wave|carbon dioxide|\bCO2\b|net[- ]zero/i },
+  { id: "policy", family: "climate", label: "Water & environmental policy", rx: /\bpolic(?:y|ies)\b|regulat|legislat|\bEPA\b|treaty|\bCOP\d*\b|water (?:management|security|rights|supply)|sustainab/i },
+];
+const FAM = Object.fromEntries(FAMILIES.map((f) => [f.id, f]));
+THEMES.forEach((t) => { t.color = FAM[t.family].color; });
 const TH = Object.fromEntries(THEMES.map((t) => [t.id, t]));
 
 let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, CAT = {};
 const S = { q: "", cat: null, theme: null, days: 45, mine: false, jq: "", jtype: "All", jsort: "fit", savedOnly: false,
-  mineThemes: new Set(store.get("themes", THEMES.map((t) => t.id))), saved: new Set(store.get("saved", [])) };
+  mineThemes: new Set(store.get("branches", THEMES.map((t) => t.id)).filter((id) => THEMES.some((t) => t.id === id))), saved: new Set(store.get("saved", [])) };
+if (!S.mineThemes.size) S.mineThemes = new Set(THEMES.map((t) => t.id));
 
 /* ---------- helpers ---------- */
 const hours = (iso) => (Date.now() - new Date(iso).getTime()) / 36e5;
 const ago = (iso) => { const h = hours(iso); return h < 1 ? "just now" : h < 24 ? `${Math.round(h)} h ago` : h < 48 ? "yesterday" : h < 24 * 7 ? `${Math.round(h / 24)} days ago` : new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }); };
 const isNew = (i, data) => data.updated && i.firstSeen === data.updated && hours(i.date) < 72;
-const textOf = (i) => `${i.title} ${i.summary || ""} ${i.employer || ""}`;
+const textOf = (i) => `${i.title} ${i.summary || ""} ${i.employer || ""} ${i.source || ""}`;
 const themesOf = (i) => (i._t ||= THEMES.filter((t) => t.rx.test(textOf(i))).map((t) => t.id));
+const familiesOf = (i) => [...new Set(themesOf(i).map((t) => TH[t].family))];
+/* A filter value is a branch id, or "fam:<family>" for a whole field. */
+const inTheme = (i, v) => (v.startsWith("fam:") ? familiesOf(i).includes(v.slice(4)) : themesOf(i).includes(v));
+const themeName = (v) => (v.startsWith("fam:") ? FAM[v.slice(4)]?.label : TH[v]?.label) || "";
 const myScore = (i) => themesOf(i).filter((t) => S.mineThemes.has(t)).length;
 const color = (id) => CAT[id]?.color || "#0f766e";
 
@@ -117,11 +177,24 @@ function trending() {
 }
 function radar() {
   const week = NEWS.items.filter((i) => hours(i.date) < 24 * 7);
-  return `<div class="radar">${THEMES.map((t) => {
-    const list = week.filter((i) => themesOf(i).includes(t.id));
+  return `<div class="radar">${FAMILIES.map((f) => {
+    const list = week.filter((i) => familiesOf(i).includes(f.id));
     const top = list.find((i) => i.kind === "News") || list[0];
-    return `<button class="rt" data-theme="${t.id}"><i style="background:${t.color}"></i><span><b>${esc(t.label)}</b><small>${top ? esc(top.title) : "Nothing new this week"}</small></span><span class="n">${list.length}</span></button>`;
+    return `<button class="rt" data-theme="fam:${f.id}"><i style="background:${f.color}"></i><span><b>${esc(f.label)}</b><small>${top ? esc(top.title) : "Nothing new this week"}</small></span><span class="n">${list.length}</span></button>`;
   }).join("")}</div>`;
+}
+/* Branches page: every field as a card with its branches */
+function viewBranches() {
+  const week = NEWS.items.filter((i) => hours(i.date) < 24 * 7);
+  return `<section class="atlas-intro"><h2>Explore Earth and planetary science</h2><p>Six fields and ${THEMES.length} branches. Pick a branch to see its news and research papers; numbers count this week's stories and papers.</p></section>
+    <div class="atlas">${FAMILIES.map((f) => {
+      const branches = THEMES.filter((t) => t.family === f.id);
+      const famCount = week.filter((i) => familiesOf(i).includes(f.id)).length;
+      const top = week.find((i) => i.kind === "News" && familiesOf(i).includes(f.id) && i.image) || week.find((i) => familiesOf(i).includes(f.id));
+      return `<article class="field" style="--c:${f.color}"><header><span class="dot"></span><div><h3>${esc(f.label)}</h3><p>${esc(f.blurb)}</p></div><button class="count-btn" data-theme="fam:${f.id}" data-go="news">${famCount}</button></header>
+        <div class="branches">${branches.map((t) => { const n = week.filter((i) => themesOf(i).includes(t.id)).length; return `<button class="branch" data-theme="${t.id}" data-go="news"><span>${esc(t.label)}</span><span class="n">${n}</span></button>`; }).join("")}</div>
+        ${top ? `<a class="field-top" href="${esc(safeUrl(top.link))}" target="_blank" rel="noopener"><small>Latest</small>${esc(top.title)}</a>` : ""}</article>`;
+    }).join("")}</div>`;
 }
 function viewToday() {
   const items = NEWS.items;
@@ -131,38 +204,43 @@ function viewToday() {
   const topJobs = [...JOBS.items].sort((a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date)).slice(0, 5);
   let html = `<section class="lead">`;
   if (lead) html += `<a class="story" href="${esc(safeUrl(lead.link))}" target="_blank" rel="noopener">${pic(lead, 960, 540)}${meta(lead)}<h2>${esc(lead.title)}</h2><p>${esc(lead.summary)}</p>${themeLine(lead)}</a>`;
-  html += `<div class="side"><div class="panel"><h3>This week by theme</h3><p class="sub">Stories and papers for each research theme. Pick one to see them all.</p>${radar()}</div>
+  html += `<div class="side"><div class="panel"><h3>This week by field</h3><p class="sub">Stories and papers in each field of Earth and planetary science. Pick one to see them all, or <a href="#branches">explore every branch</a>.</p>${radar()}</div>
     <div class="panel"><h3>At a glance</h3><div class="glance"><div><b>${day}</b><span>stories in 24 h</span></div><div><b>${items.filter((i) => i.kind === "Paper" && hours(i.date) < 24 * 7).length}</b><span>papers this week</span></div><div><b>${JOBS.items.filter((j) => hours(j.date) < 24 * 7).length}</b><span>new jobs this week</span></div></div>
     <h3 style="margin-top:6px">Trending</h3><div class="chips">${trending().map((t) => `<button class="chip" data-trend="${esc(t)}">${esc(t)}</button>`).join("") || '<span class="note">Not enough stories yet.</span>'}</div></div></div></section>`;
   html += `<div class="cat-band">`;
-  for (const t of THEMES.filter((t) => S.mineThemes.has(t.id))) {
-    const list = items.filter((i) => i !== lead && themesOf(i).includes(t.id)).slice(0, 10);
+  for (const f of FAMILIES) {
+    const mine = THEMES.filter((t) => t.family === f.id && S.mineThemes.has(t.id));
+    if (!mine.length) continue;
+    const inMine = (i) => mine.some((t) => themesOf(i).includes(t.id));
+    const list = items.filter((i) => i !== lead && inMine(i)).slice(0, 10);
     if (list.length < 2) continue;
-    html += `<section style="--c:${t.color}"><div class="sec-head"><h2>${esc(t.label)}</h2><span class="hint">${items.filter((i) => themesOf(i).includes(t.id)).length} stories and papers</span><a class="more" href="#news" data-goto-theme="${t.id}">See all</a></div><div class="rail">${list.map(tile).join("")}</div></section>`;
+    const chips = mine.map((t) => { const n = items.filter((i) => themesOf(i).includes(t.id)).length; return n ? `<button class="bchip" data-theme="${t.id}" data-go="news">${esc(t.label)} <span>${n}</span></button>` : ""; }).join("");
+    html += `<section style="--c:${f.color}"><div class="sec-head"><h2>${esc(f.label)}</h2><span class="hint">${esc(f.blurb)}</span><a class="more" href="#news" data-goto-theme="fam:${f.id}">See all</a></div><div class="bchips">${chips}</div><div class="rail">${list.map(tile).join("")}</div></section>`;
   }
   const wider = items.filter((i) => i !== lead && !themesOf(i).length && i.kind === "News").slice(0, 10);
-  if (wider.length) html += `<section style="--c:#64748b"><div class="sec-head"><h2>Wider field</h2><span class="hint">Geoscience, water, climate and policy news beyond these themes</span><a class="more" href="#news">All news</a></div><div class="rail">${wider.map(tile).join("")}</div></section>`;
-  html += `</div><p class="note">Showing ${S.mineThemes.size} of ${THEMES.length} themes. <button class="linkbtn" data-edit-themes>Choose your themes</button></p>`;
+  if (wider.length) html += `<section style="--c:#64748b"><div class="sec-head"><h2>Wider field</h2><span class="hint">Science and environment news outside the branches above</span><a class="more" href="#news">All news</a></div><div class="rail">${wider.map(tile).join("")}</div></section>`;
+  html += `</div><p class="note">Showing ${S.mineThemes.size} of ${THEMES.length} branches. <button class="linkbtn" data-edit-themes>Choose your branches</button> · <a href="#branches">Explore all branches</a></p>`;
   if (topJobs.length) html += `<section><div class="sec-head"><h2>Jobs in these fields</h2><span class="hint">${JOBS.items.length} open positions from the AGU, Science and Chronicle job boards</span><a class="more" href="#jobs">All jobs</a></div><div class="list">${topJobs.map(jobRow).join("")}</div></section>`;
   return html;
 }
 function viewList(kind) {
   const q = S.q.toLowerCase();
   const base = NEWS.items.filter((i) => i.kind === kind && hours(i.date) <= S.days * 24);
-  const list = base.filter((i) => (!S.cat || i.tags.includes(S.cat)) && (!S.theme || themesOf(i).includes(S.theme)) && (!S.mine || myScore(i) > 0)
+  const list = base.filter((i) => (!S.cat || i.tags.includes(S.cat)) && (!S.theme || inTheme(i, S.theme)) && (!S.mine || myScore(i) > 0)
     && (!q || `${i.title} ${i.summary} ${i.source}`.toLowerCase().includes(q)));
-  const themeOpts = [["", "All themes", base.length], ...THEMES.map((t) => [t.id, t.label, base.filter((i) => themesOf(i).includes(t.id)).length, t.color])];
+  const themeOpts = [["", "All branches", base.length], ...FAMILIES.flatMap((f) => [[`fam:${f.id}`, f.label, base.filter((i) => familiesOf(i).includes(f.id)).length, f.color, true],
+    ...THEMES.filter((t) => t.family === f.id).map((t) => [t.id, t.label, base.filter((i) => themesOf(i).includes(t.id)).length, null, false])])].filter((o) => o[0] === "" || o[2]);
   const catOpts = [["", "Every topic", base.length], ...NEWS.categories.map((c) => [c.id, c.label, base.filter((i) => i.tags.includes(c.id)).length, c.color]).filter((x) => x[2])];
-  const opt = (attr, cur) => ([v, label, n, c]) => `<button class="opt" data-${attr}="${v}" aria-pressed="${(cur || "") === v}"><span>${c ? `<i style="background:${c}"></i>` : ""}${esc(label)}</span><span class="n">${n}</span></button>`;
+  const opt = (attr, cur) => ([v, label, n, c, head]) => `<button class="opt${head ? " fam" : head === false ? " sub" : ""}" data-${attr}="${v}" aria-pressed="${(cur || "") === v}"><span>${c ? `<i style="background:${c}"></i>` : ""}${esc(label)}</span><span class="n">${n}</span></button>`;
   const days = [[3, "Last 3 days"], [7, "This week"], [45, "Everything"]];
   return `<div class="layout"><aside class="filters" aria-label="Filters">
-      <div><h4>Theme</h4>${themeOpts.map(opt("theme", S.theme)).join("")}</div>
+      <div><h4>Field and branch</h4>${themeOpts.map(opt("theme", S.theme)).join("")}</div>
       <div><h4>Topic</h4>${catOpts.map(opt("cat", S.cat)).join("")}</div>
       <div><h4>When</h4>${days.map(([d, l]) => `<button class="opt" data-days="${d}" aria-pressed="${S.days === d}"><span>${l}</span></button>`).join("")}</div>
-      <div><h4>Focus</h4><button class="opt" data-mine aria-pressed="${S.mine}"><span>Only my themes</span></button></div>
+      <div><h4>Focus</h4><button class="opt" data-mine aria-pressed="${S.mine}"><span>Only my branches</span></button></div>
     </aside>
     <div><div class="toolbar"><label class="search"><input id="q" type="search" placeholder="Search ${kind === "Paper" ? "papers" : "news"}…" value="${esc(S.q)}" aria-label="Search"></label><span class="count">${list.length} ${kind === "Paper" ? "papers" : "stories"}</span></div>
-    <div class="list">${list.slice(0, 120).map(row).join("") || '<p class="empty">Nothing matches. Try another theme or a wider time range.</p>'}</div></div></div>`;
+    <div class="list">${list.slice(0, 120).map(row).join("") || '<p class="empty">Nothing matches. Try another branch or a wider time range.</p>'}</div></div></div>`;
 }
 
 /* jobs */
@@ -177,7 +255,7 @@ function jobRow(j) {
     <div class="meta"><span class="pill">${esc(j.type)}</span>${j.salary ? `<span>${esc(j.salary)}</span>` : ""}<span>Posted ${ago(j.date)}</span><span>${esc(j.board)}</span>${isNew(j, JOBS) ? '<span class="pill new">New</span>' : ""}</div>
     ${j.summary ? `<p>${esc(j.summary)}</p>` : ""}${themeLine(j)}</div>
     <div class="right"><button class="save" data-save="${esc(j.id)}" aria-pressed="${S.saved.has(j.id)}" aria-label="Save this job">${S.saved.has(j.id) ? "★" : "☆"}</button>
-    <div class="fit" title="How many themes it matches">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= fit ? "on" : ""}"></i>`).join("")}</div></div></article>`;
+    <div class="fit" title="How many branches it matches">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= fit ? "on" : ""}"></i>`).join("")}</div></div></article>`;
 }
 function elsewhere() {
   const q = S.jq || "hydrogeophysics";
@@ -189,44 +267,44 @@ function elsewhere() {
 }
 function viewJobs() {
   const q = S.jq.toLowerCase();
-  let list = JOBS.items.filter((j) => (S.jtype === "All" || j.type === S.jtype) && (!S.theme || themesOf(j).includes(S.theme)) && (!S.savedOnly || S.saved.has(j.id)) && (!q || `${j.title} ${j.employer} ${j.location} ${j.summary}`.toLowerCase().includes(q)));
+  let list = JOBS.items.filter((j) => (S.jtype === "All" || j.type === S.jtype) && (!S.theme || inTheme(j, S.theme)) && (!S.savedOnly || S.saved.has(j.id)) && (!q || `${j.title} ${j.employer} ${j.location} ${j.summary}`.toLowerCase().includes(q)));
   list = list.sort(S.jsort === "fit" ? (a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date) : (a, b) => b.date.localeCompare(a.date));
   const n = (t) => (t === "All" ? JOBS.items.length : JOBS.items.filter((j) => j.type === t).length);
   return `<div class="layout"><aside class="filters" aria-label="Job filters">
       <div><h4>Position</h4>${JOB_TYPES.map((t) => `<button class="opt" data-jtype="${esc(t)}" aria-pressed="${S.jtype === t}"><span>${esc(t)}</span><span class="n">${n(t)}</span></button>`).join("")}</div>
-      <div><h4>Theme</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All themes</span></button>${THEMES.map((t) => `<button class="opt" data-theme="${t.id}" aria-pressed="${S.theme === t.id}"><span><i style="background:${t.color}"></i>${esc(t.label)}</span><span class="n">${JOBS.items.filter((j) => themesOf(j).includes(t.id)).length}</span></button>`).join("")}</div>
+      <div><h4>Field</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All fields</span></button>${FAMILIES.map((f) => `<button class="opt" data-theme="fam:${f.id}" aria-pressed="${S.theme === `fam:${f.id}`}"><span><i style="background:${f.color}"></i>${esc(f.label)}</span><span class="n">${JOBS.items.filter((j) => familiesOf(j).includes(f.id)).length}</span></button>`).join("")}</div>
       <div><h4>Sort</h4><button class="opt" data-jsort="fit" aria-pressed="${S.jsort === "fit"}"><span>Best fit first</span></button><button class="opt" data-jsort="new" aria-pressed="${S.jsort === "new"}"><span>Newest first</span></button></div>
       <div><h4>Saved</h4><button class="opt" data-saved aria-pressed="${S.savedOnly}"><span>Only saved jobs</span><span class="n">${S.saved.size}</span></button></div>
     </aside><div>
     <div class="toolbar"><label class="search"><input id="jq" type="search" placeholder="Search jobs: hydrogeologist, postdoc, Ohio…" value="${esc(S.jq)}" aria-label="Search jobs"></label><span class="count">${list.length} jobs</span></div>
     ${elsewhere()}
-    <div class="list">${list.slice(0, 150).map(jobRow).join("") || '<p class="empty">No jobs match. Try another search, theme or position type.</p>'}</div></div></div>`;
+    <div class="list">${list.slice(0, 150).map(jobRow).join("") || '<p class="empty">No jobs match. Try another search, field or position type.</p>'}</div></div></div>`;
 }
 
 /* ---------- choose themes ---------- */
 function editThemes() {
   const back = document.createElement("div"); back.className = "modal-back";
-  const box = document.createElement("div"); box.className = "panel modal"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Choose your themes");
-  box.innerHTML = `<h3>Your themes</h3><p class="sub">Today shows a row for each theme you pick, and “Only my themes” filters to them. Saved in this browser only.</p>
-    ${THEMES.map((t) => `<label><input type="checkbox" value="${t.id}" ${S.mineThemes.has(t.id) ? "checked" : ""}><i class="theme-dot" style="background:${t.color}"></i>${esc(t.label)}</label>`).join("")}
+  const box = document.createElement("div"); box.className = "panel modal"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Choose your branches");
+  box.innerHTML = `<h3>Your branches</h3><p class="sub">Today shows the fields of the branches you pick, and “Only my branches” filters to them. Saved in this browser only.</p>
+    <div class="modal-scroll">${FAMILIES.map((f) => `<h4 style="color:${f.color}">${esc(f.label)}</h4>${THEMES.filter((t) => t.family === f.id).map((t) => `<label><input type="checkbox" value="${t.id}" ${S.mineThemes.has(t.id) ? "checked" : ""}><i class="theme-dot" style="background:${t.color}"></i>${esc(t.label)}</label>`).join("")}`).join("")}</div>
     <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" data-m="cancel">Cancel</button><button class="btn primary" data-m="save">Save</button></div>`;
   document.body.append(back, box);
   const close = () => { back.remove(); box.remove(); };
   back.addEventListener("click", close);
   box.addEventListener("click", (e) => {
     const b = e.target.closest("[data-m]"); if (!b) return;
-    if (b.dataset.m === "save") { S.mineThemes = new Set([...box.querySelectorAll("input:checked")].map((x) => x.value)); store.set("themes", [...S.mineThemes]); }
+    if (b.dataset.m === "save") { S.mineThemes = new Set([...box.querySelectorAll("input:checked")].map((x) => x.value)); store.set("branches", [...S.mineThemes]); }
     close(); render();
   });
 }
 
 /* ---------- render + routing ---------- */
-const route = () => (["today", "news", "papers", "jobs"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
+const route = () => (["today", "branches", "news", "papers", "jobs"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
 function render() {
   const r = route(), view = $("#view");
   const keep = document.activeElement?.id, pos = document.activeElement?.selectionStart;
   document.querySelectorAll("nav.tabs a").forEach((a) => a.setAttribute("aria-current", a.getAttribute("href") === `#${r}` ? "page" : "false"));
-  view.innerHTML = !NEWS.items.length && r !== "jobs" ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : viewToday();
+  view.innerHTML = !NEWS.items.length && r !== "jobs" ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "branches" ? viewBranches() : viewToday();
   paint(view);
   if (keep && document.getElementById(keep)) { const el = document.getElementById(keep); el.focus(); if (pos != null && el.setSelectionRange) el.setSelectionRange(pos, pos); }
 }
@@ -246,7 +324,7 @@ document.addEventListener("click", (e) => {
   const t = e.target.closest("button, a"); if (!t) return;
   const d = t.dataset;
   if (d.cat !== undefined && t.classList.contains("opt")) { S.cat = d.cat || null; render(); }
-  else if (d.theme !== undefined) { S.theme = d.theme || null; if (t.classList.contains("rt")) location.hash = "#news"; else render(); }
+  else if (d.theme !== undefined) { S.theme = d.theme || null; S.cat = null; if (t.classList.contains("rt") || d.go) location.hash = `#${d.go || "news"}`; else render(); if (location.hash === `#${d.go || "news"}`) render(); }
   else if (d.days) { S.days = +d.days; render(); }
   else if (d.mine !== undefined) { S.mine = !S.mine; render(); }
   else if (d.trend) { S.q = d.trend; S.theme = null; location.hash = "#news"; }

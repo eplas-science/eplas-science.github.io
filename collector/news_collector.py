@@ -41,6 +41,7 @@ CATEGORIES = [  # id, heading, colour (priority order for the main heading: most
     ("water", "Water Resources Management", "#0891b2"),
     ("climate", "Climate Change", "#dc2626"),
     ("ecology", "Ecology", "#16a34a"),
+    ("planetary", "Planetary Science", "#4338ca"),
     ("geoscience", "Geoscience", "#a16207"),
 ]
 ORDER = [c[0] for c in CATEGORIES]
@@ -90,6 +91,39 @@ SOURCES = [
     ("Journal of Applied Geophysics", "https://rss.sciencedirect.com/publication/science/09269851", "Paper", ["nsg"]),
     ("Journal of Hydrology", "https://rss.sciencedirect.com/publication/science/00221694", "Paper", ["hydrology"]),
     ("Science of the Total Environment", "https://rss.sciencedirect.com/publication/science/00489697", "Paper", ["ecology"]),
+    # Earth and planetary science, added 2026-11-26 (each feed tested before adding)
+    ("NASA News", "https://www.nasa.gov/news-release/feed/", "News", []),
+    ("The Planetary Society", "https://www.planetary.org/rss/articles", "News", ["planetary"]),
+    ("USGS Significant Earthquakes", "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.atom", "News", ["geoscience"]),
+    ("Smithsonian Weekly Volcanic Activity", "https://volcano.si.edu/news/WeeklyVolcanoRSS.xml", "News", ["geoscience"]),
+    ("ScienceDaily: Earthquakes", "https://www.sciencedaily.com/rss/earth_climate/earthquakes.xml", "News", ["geoscience"]),
+    ("ScienceDaily: Volcanoes", "https://www.sciencedaily.com/rss/earth_climate/volcanoes.xml", "News", ["geoscience"]),
+    ("ScienceDaily: Fossils", "https://www.sciencedaily.com/rss/fossils_ruins/fossils.xml", "News", ["geoscience"]),
+    ("ScienceDaily: Paleontology", "https://www.sciencedaily.com/rss/fossils_ruins/paleontology.xml", "News", ["geoscience"]),
+    ("ScienceDaily: Geography", "https://www.sciencedaily.com/rss/earth_climate/geography.xml", "News", ["geoscience"]),
+    ("ScienceDaily: Mars", "https://www.sciencedaily.com/rss/space_time/mars.xml", "News", ["planetary"]),
+    ("ScienceDaily: Solar System", "https://www.sciencedaily.com/rss/space_time/solar_system.xml", "News", ["planetary"]),
+    ("Phys.org: Planetary Sciences", "https://phys.org/rss-feed/space-news/planetary-sciences/", "News", ["planetary"]),
+    ("Phys.org: Paleontology", "https://phys.org/rss-feed/biology-news/paleontology-fossils/", "News", ["geoscience"]),
+    ("Earth and Planetary Science Letters", "https://rss.sciencedirect.com/publication/science/0012821X", "Paper", ["geoscience"]),
+    ("Icarus", "https://rss.sciencedirect.com/publication/science/00191035", "Paper", ["planetary"]),
+    ("JGR Planets", "https://agupubs.onlinelibrary.wiley.com/feed/21699100/most-recent", "Paper", ["planetary"]),
+    ("JGR Solid Earth", "https://agupubs.onlinelibrary.wiley.com/feed/21699356/most-recent", "Paper", ["geoscience"]),
+    ("JGR Earth Surface", "https://agupubs.onlinelibrary.wiley.com/feed/21699011/most-recent", "Paper", ["geoscience"]),
+    ("Tectonics", "https://agupubs.onlinelibrary.wiley.com/feed/19449194/most-recent", "Paper", ["geoscience"]),
+    ("Geochemistry, Geophysics, Geosystems", "https://agupubs.onlinelibrary.wiley.com/feed/15252027/most-recent", "Paper", ["geoscience"]),
+    ("Tectonophysics", "https://rss.sciencedirect.com/publication/science/00401951", "Paper", ["geoscience"]),
+    ("Chemical Geology", "https://rss.sciencedirect.com/publication/science/00092541", "Paper", ["geoscience"]),
+    ("Sedimentary Geology", "https://rss.sciencedirect.com/publication/science/00370738", "Paper", ["geoscience"]),
+    ("Geomorphology", "https://rss.sciencedirect.com/publication/science/0169555X", "Paper", ["geoscience"]),
+    ("Engineering Geology", "https://rss.sciencedirect.com/publication/science/00137952", "Paper", ["geoscience"]),
+    ("Ore Geology Reviews", "https://rss.sciencedirect.com/publication/science/01691368", "Paper", ["geoscience"]),
+    ("J. Volcanology & Geothermal Research", "https://rss.sciencedirect.com/publication/science/03770273", "Paper", ["geoscience"]),
+    ("Palaeogeography, Palaeoclimatology, Palaeoecology", "https://rss.sciencedirect.com/publication/science/00310182", "Paper", ["geoscience"]),
+    ("Solid Earth (EGU)", "https://se.copernicus.org/xml/rss2_0.xml", "Paper", ["geoscience"]),
+    ("Earth Surface Dynamics (EGU)", "https://esurf.copernicus.org/xml/rss2_0.xml", "Paper", ["geoscience"]),
+    ("Natural Hazards and Earth System Sciences", "https://nhess.copernicus.org/xml/rss2_0.xml", "Paper", ["geoscience"]),
+    ("Climate of the Past", "https://cp.copernicus.org/xml/rss2_0.xml", "Paper", ["climate"]),
 ]
 
 NO_DESC = {"AGU Newsroom"}  # its feed description is a site-wide banner, not the story
@@ -104,6 +138,7 @@ RULES = {
     "water": r"water (?:management|resources?|supply|security|quality|use|rights|utilit)|irrigation|reservoir|drinking water|wastewater|desalination|nutrient load|algal bloom|\bdam\b|lake erie",
     "climate": r"climate|global warming|greenhouse|carbon dioxide|\bCO2\b|emission|warming|\bIPCC\b|heat ?wave|sea[- ]level|net[- ]zero|decarboni",
     "ecology": r"ecolog|biodiversity|species|ecosystem|forest|wildlife|habitat|\bplants?\b|microb|wetland|pollinat|coral",
+    "planetary": r"\bmars\b|martian|lunar|\bthe moon\b|moon's|asteroid|comet|meteorit|planetary|solar system|exoplanet|\bvenus\b|jupiter|saturn|europa|enceladus|\btitan\b|rover|impact crater",
     "geoscience": r"geolog|earthquake|volcan|tectonic|sediment|mineral|\brocks?\b|mantle|\bfaults?\b|erosion|glacier|permafrost|\bsoils?\b|landslide|geochem",
 }
 PHD = r"\btrees?\b|\bstems?\b|trunk|\broots?\b|soil[- ]plant|soil moisture|sap ?flow|transpiration|resistivity|induced polari|self[- ]potential|critical zone|machine learning|deep learning|neural network|biogeochem|ecohydrolog|vadose|lake erie|maumee|great lakes|electrical"
