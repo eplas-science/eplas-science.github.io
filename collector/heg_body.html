@@ -286,6 +286,22 @@
 .mm b.clamp { font-size: 13.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .meet-mini .due { align-self: flex-start; }
 .meet-strip { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+/* ---- branches page, light version ---- */
+.field { border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 12px; gap: 12px; box-shadow: none; }
+.fhead { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+.fhead .fi { color: var(--c); padding-top: 2px; }
+.fhead h3 { margin: 0; font: 600 17px/1.25 var(--display); color: var(--ink); }
+.fhead p { margin: 3px 0 0; font-size: 13px; line-height: 1.45; color: var(--muted); }
+.fcount { border: 0; background: none; padding: 0; cursor: pointer; text-align: right; font: 600 16px/1.1 var(--display); color: var(--ink); }
+.fcount small { display: block; margin-top: 2px; font: 400 11px var(--body); color: var(--faint); }
+.fcount:hover { color: var(--c); }
+.field .branches { gap: 0; border-top: 1px solid var(--line); }
+.field .branch { background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 9px 2px; font-size: 14px; }
+.field .branch:last-child { border-bottom: 0; }
+.field .branch:hover { background: none; border-color: var(--line); color: var(--c); }
+.field .branch .n { font: 400 12px var(--mono); color: var(--faint); }
+.field-top { border-top: 1px solid var(--line); padding-top: 10px; font-size: 13.5px; }
+.field-top small { font: 500 10.5px var(--mono); letter-spacing: .08em; }
 </style>
 
 <header class="top"><div class="wrap">
@@ -452,7 +468,7 @@ function viewBranches() {
       const branches = THEMES.filter((t) => t.family === f.id);
       const famCount = week.filter((i) => familiesOf(i).includes(f.id)).length;
       const top = week.find((i) => i.kind === "News" && familiesOf(i).includes(f.id) && i.image) || week.find((i) => familiesOf(i).includes(f.id));
-      return `<article class="field" style="--c:${f.color}"><header><span class="fico">${ic(f.id, 20)}</span><div><h3>${esc(f.label)}</h3><p>${esc(f.blurb)}</p></div><button class="count-btn" data-theme="fam:${f.id}" data-go="news">${famCount}</button></header>
+      return `<article class="field" style="--c:${f.color}"><div class="fhead"><span class="fi">${ic(f.id, 20)}</span><div><h3>${esc(f.label)}</h3><p>${esc(f.blurb)}</p></div><button class="fcount" data-theme="fam:${f.id}" data-go="news" title="This week's stories and papers">${famCount}<small>this week</small></button></div>
         <div class="branches">${branches.map((t) => { const n = week.filter((i) => themesOf(i).includes(t.id)).length; return `<button class="branch" data-theme="${t.id}" data-go="news"><span>${esc(t.label)}</span><span class="n">${n}</span></button>`; }).join("")}</div>
         ${top ? `<a class="field-top" href="${esc(safeUrl(top.link))}" target="_blank" rel="noopener"><small>Latest</small>${esc(top.title)}</a>` : ""}</article>`;
     }).join("")}</div>`;
