@@ -1,9 +1,9 @@
-# HEG Lab News Desk
+# The Continuum
 
-An informal news desk for members of the Hydro- & Environmental Geophysics Lab (HEG-Lab),
-Department of Environmental Sciences, University of Toledo. Not an official university page.
+An informal, automatically updated digest of news, research papers and jobs in hydrology, soil science
+and environmental geophysics. Not affiliated with any university.
 
-News, research papers and jobs across the lab's themes: soil moisture and salinity, coastal
+News, research papers and jobs across these themes: soil moisture and salinity, coastal
 interfaces and flooding, wetlands and biogeochemistry, plants and trees, groundwater, contamination,
 archaeology and forensics, and geophysical methods (ERT, IP, SP, EM, GPR, seismic) with machine learning.
 
@@ -17,7 +17,7 @@ links to the same search on those sites instead.
 
 - Update now: Actions → "Update The Continuum" → Run workflow.
 - Add a feed: append to `SOURCES` (news) or `JOB_BOARDS` / `JOB_QUERIES` (jobs) in the collector.
-- Headings: keyword rules are in `RULES`. Lab themes: `THEMES` in `collector/heg_body.html`; rebuild the
+- Headings: keyword rules are in `RULES`. Themes: `THEMES` in `collector/heg_body.html`; rebuild the
   page with `python collector/build_template.py <path to the shared news_site.html>`.
 - GitHub pauses scheduled workflows in a repository with no activity for 60 days; any commit (or
   re-enabling the workflow on the Actions tab) starts it again.
