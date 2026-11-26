@@ -21,3 +21,10 @@ links to the same search on those sites instead.
   page with `python collector/build_template.py <path to the shared news_site.html>`.
 - GitHub pauses scheduled workflows in a repository with no activity for 60 days; any commit (or
   re-enabling the workflow on the Actions tab) starts it again.
+
+## Search engines
+
+`collector/seo.py` runs after the collector on every update. It writes the latest 80 headlines into the page as plain
+HTML (the app replaces them once it loads), plus `robots.txt` and `sitemap.xml`, and copies `og-image.png` (the link
+preview; redraw it with `collector/make_og_image.py`). Search-engine ownership files go in `collector/verify/` and are
+published at the site root.
