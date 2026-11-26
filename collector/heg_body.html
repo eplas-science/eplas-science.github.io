@@ -48,6 +48,8 @@
 .opt.sub { padding-left: 26px; font-size: 13.5px; }
 .modal-scroll { max-height: 60vh; overflow: auto; padding-right: 4px; }
 .modal-scroll h4 { margin: 12px 0 4px; font-size: 13px; text-transform: uppercase; letter-spacing: .05em; }
+.other-kind { margin-left: auto; font-weight: 600; color: #0f766e; text-decoration: none; white-space: nowrap; }
+.other-kind:hover { text-decoration: underline; }
 /* theme radar */
 .radar { display: flex; flex-direction: column; }
 .radar a, .radar button.rt { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); text-align: left; background: none; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
@@ -239,7 +241,7 @@ function viewList(kind) {
       <div><h4>When</h4>${days.map(([d, l]) => `<button class="opt" data-days="${d}" aria-pressed="${S.days === d}"><span>${l}</span></button>`).join("")}</div>
       <div><h4>Focus</h4><button class="opt" data-mine aria-pressed="${S.mine}"><span>Only my branches</span></button></div>
     </aside>
-    <div><div class="toolbar"><label class="search"><input id="q" type="search" placeholder="Search ${kind === "Paper" ? "papers" : "news"}…" value="${esc(S.q)}" aria-label="Search"></label><span class="count">${list.length} ${kind === "Paper" ? "papers" : "stories"}</span></div>
+    <div><div class="toolbar"><label class="search"><input id="q" type="search" placeholder="Search ${kind === "Paper" ? "papers" : "news"}…" value="${esc(S.q)}" aria-label="Search"></label><span class="count">${list.length} ${kind === "Paper" ? "papers" : "stories"}</span>${S.theme ? (() => { const other = kind === "Paper" ? "News" : "Paper"; const n = NEWS.items.filter((i) => i.kind === other && hours(i.date) <= S.days * 24 && inTheme(i, S.theme)).length; return n ? `<a class="other-kind" href="#${other === "Paper" ? "papers" : "news"}">See the ${n} ${other === "Paper" ? "research papers" : "news stories"} in ${esc(themeName(S.theme))} →</a>` : ""; })() : ""}</div>
     <div class="list">${list.slice(0, 120).map(row).join("") || '<p class="empty">Nothing matches. Try another branch or a wider time range.</p>'}</div></div></div>`;
 }
 
