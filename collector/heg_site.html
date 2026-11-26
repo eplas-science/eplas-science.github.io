@@ -1,5 +1,5 @@
-<title>The Continuum</title>
-<meta name="claude:viewport-fit-sides" content="cover">
+<title>HEG Lab News Desk</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650;12..96,750&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -156,15 +156,6 @@ main { padding-block: 22px 60px; display: flex; flex-direction: column; gap: 34p
 .elsewhere a { border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; background: var(--surface); }
 .elsewhere a:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ask */
-.ask { max-width: 760px; display: flex; flex-direction: column; gap: 14px; }
-.msgs { display: flex; flex-direction: column; gap: 14px; }
-.msg { padding: 12px 15px; border-radius: 14px; max-width: 90%; white-space: pre-wrap; font-size: 14.5px; }
-.msg.me { align-self: flex-end; background: var(--ink); color: var(--surface); }
-.msg.ai { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); }
-.ask form { display: flex; gap: 8px; }
-.ask textarea { flex: 1; min-width: 0; resize: vertical; min-height: 48px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; padding: 10px 12px; }
-.note { color: var(--muted); font-size: 13px; }
 
 footer { border-top: 1px solid var(--line); padding-block: 22px 40px; color: var(--muted); font-size: 12.5px; display: flex; flex-direction: column; gap: 8px; }
 footer details summary { cursor: pointer; }
@@ -185,12 +176,27 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
   .brand small { display: none; }
   .glance b { font-size: 20px; }
 }
+/* lab radar */
+.radar { display: flex; flex-direction: column; }
+.radar a, .radar button.rt { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 9px 0; border-top: 1px solid var(--line); text-align: left; background: none; border-left: 0; border-right: 0; border-bottom: 0; cursor: pointer; color: inherit; font: inherit; width: 100%; }
+.radar .rt:first-child { border-top: 0; }
+.radar i { width: 10px; height: 10px; border-radius: 3px; align-self: center; }
+.radar b { font-weight: 600; font-size: 14px; display: block; }
+.radar small { color: var(--muted); font-size: 12.5px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.radar .n { font: 500 12px var(--mono); color: var(--faint); }
+.radar .rt:hover b { color: var(--accent); }
+.theme-dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; vertical-align: 1px; }
+.tagline { display: flex; flex-wrap: wrap; gap: 5px; }
+.tagline span { font-size: 11.5px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
+.modal-back { position: fixed; inset: 0; background: rgba(0, 0, 0, .35); z-index: 19; }
+.modal { position: fixed; z-index: 20; left: 50%; top: 12%; transform: translateX(-50%); width: min(560px, 92vw); box-shadow: 0 20px 60px rgba(0, 0, 0, .25); }
+.modal label { display: flex; gap: 10px; align-items: center; padding: 6px 0; font-size: 14px; }
 </style>
 
 <header class="top"><div class="wrap">
-  <div class="brand"><h1>The <span>Continuum</span></h1><small>News, papers and jobs from soil to atmosphere</small></div>
+  <div class="brand"><h1>HEG <span>Lab</span></h1><small>Hydro- &amp; Environmental Geophysics · news, papers and jobs</small></div>
   <nav class="tabs" aria-label="Sections">
-    <a href="#today">Today</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a><a href="#ask">Ask</a>
+    <a href="#today">Today</a><a href="#news">News</a><a href="#papers">Papers</a><a href="#jobs">Jobs</a>
   </nav>
 </div></header>
 <div class="ticker" aria-label="Latest headlines"><div class="wrap"><span class="tag">Live</span><div class="window"><div class="track" id="ticker"></div></div></div></div>
@@ -206,26 +212,38 @@ const $ = (s, el = document) => el.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const safeUrl = (u) => (/^https:\/\//i.test(u || "") ? u : "");
 const store = {
-  get(k, d) { try { const v = localStorage.getItem("continuum." + k); return v ? JSON.parse(v) : d; } catch { return d; } },
-  set(k, v) { try { localStorage.setItem("continuum." + k, JSON.stringify(v)); } catch { /* private window */ } },
+  get(k, d) { try { const v = localStorage.getItem("heglab." + k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem("heglab." + k, JSON.stringify(v)); } catch { /* private window */ } },
 };
 const embedded = (id) => { const t = (document.getElementById(id)?.textContent || "").trim(); if (!t || t.startsWith("/*")) return null; try { return JSON.parse(t); } catch { return null; } };
 
+/* The lab's research themes. Every story, paper and job is matched against these keywords. */
+const THEMES = [
+  { id: "moisture", label: "Soil moisture & salinity", color: "#0284c7", rx: /soil moisture|water content|moisture content|salinit|saline|\bsalt|vadose|unsaturated|infiltration|soil water|evapotranspiration/i },
+  { id: "coastal", label: "Coastal interfaces & flooding", color: "#0f766e", rx: /coast|estuar|shoreline|lake erie|great lakes|chesapeake|flood|storm surge|terrestrial.aquatic|land.lake|sea.level|saltwater|tidal/i },
+  { id: "wetlands", label: "Wetlands & biogeochemistry", color: "#65a30d", rx: /wetland|marsh|peat|biogeochem|redox|oxygen|nitrate|nitrogen|phosph|methane|nutrient|carbon cycl|soil carbon|microb/i },
+  { id: "plants", label: "Plants, roots & trees", color: "#16a34a", rx: /\btrees?\b|forest|\broots?\b|\bstems?\b|sap ?flow|xylem|transpiration|plant water|canopy|vegetation|crop/i },
+  { id: "groundwater", label: "Groundwater & aquifers", color: "#4f46e5", rx: /groundwater|aquifer|recharge|hydrogeolog|water table|karst|hydraulic conductiv|well field|drinking water/i },
+  { id: "contaminants", label: "Contamination & remediation", color: "#b45309", rx: /contamin|pollut|oil spill|crude oil|\bpfas\b|remediat|heavy metal|plume|toxic|leachate|landfill/i },
+  { id: "forensic", label: "Archaeology & forensics", color: "#9f1239", rx: /archaeolog|forensic|\bgraves?\b|burial|buried object|cultural heritage|cemetery|clandestine/i },
+  { id: "methods", label: "Geophysical methods & ML", color: "#7c3aed", rx: /resistivit|\bERT\b|induced polari|self[- ]potential|electromagnet|ground[- ]penetrating|\bGPR\b|seismic|geophysic|tomograph|inversion|machine learning|deep learning|neural network|geoelectric/i },
+];
+const TH = Object.fromEntries(THEMES.map((t) => [t.id, t]));
+
 let NEWS = { items: [], categories: [], sources: [] }, JOBS = { items: [], sources: [] }, CAT = {};
-const DEFAULT_INTERESTS = ["electrical resistivity", "induced polarization", "self-potential", "sap flow", "tree", "soil moisture", "ecohydrology", "groundwater", "machine learning", "Lake Erie"];
-const S = { q: "", cat: null, days: 45, phd: false, jq: "", jtype: "All", jsort: "fit", savedOnly: false,
-  interests: store.get("interests", DEFAULT_INTERESTS), saved: new Set(store.get("saved", [])), explained: {} };
-let sample = null, sampleTools = false;
+const S = { q: "", cat: null, theme: null, days: 45, mine: false, jq: "", jtype: "All", jsort: "fit", savedOnly: false,
+  mineThemes: new Set(store.get("themes", THEMES.map((t) => t.id))), saved: new Set(store.get("saved", [])) };
 
 /* ---------- helpers ---------- */
 const hours = (iso) => (Date.now() - new Date(iso).getTime()) / 36e5;
 const ago = (iso) => { const h = hours(iso); return h < 1 ? "just now" : h < 24 ? `${Math.round(h)} h ago` : h < 48 ? "yesterday" : h < 24 * 7 ? `${Math.round(h / 24)} days ago` : new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }); };
 const isNew = (i, data) => data.updated && i.firstSeen === data.updated && hours(i.date) < 72;
-const interestHits = (text) => S.interests.filter((w) => w && text.toLowerCase().includes(w.toLowerCase())).length;
-const youScore = (i) => interestHits(`${i.title} ${i.summary || ""}`) * 2 + (i.phd || 0);
+const textOf = (i) => `${i.title} ${i.summary || ""} ${i.employer || ""}`;
+const themesOf = (i) => (i._t ||= THEMES.filter((t) => t.rx.test(textOf(i))).map((t) => t.id));
+const myScore = (i) => themesOf(i).filter((t) => S.mineThemes.has(t)).length;
 const color = (id) => CAT[id]?.color || "#0f766e";
 
-/* ---------- drawings for stories without a picture ---------- */
+/* drawings for stories without a picture */
 function rng(seed) { let a = 0; for (const ch of seed) a = (a * 31 + ch.charCodeAt(0)) | 0; return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 const PAL = {
   nsg: ["#1e3a8a", "#2563eb", "#22d3ee", "#a3e635", "#facc15", "#f97316", "#dc2626"],
@@ -280,20 +298,20 @@ function paint(root) {
 }
 
 /* ---------- pieces ---------- */
+function themeLine(i) {
+  const ts = themesOf(i).slice(0, 3);
+  return ts.length ? `<div class="tagline">${ts.map((t) => `<span><i class="theme-dot" style="background:${TH[t].color}"></i>${esc(TH[t].label)}</span>`).join("")}</div>` : "";
+}
 function meta(i, data = NEWS) {
   const c = CAT[i.category];
-  return `<div class="meta"><span class="cat" style="--c:${color(i.category)}">${esc(c?.label || "")}</span><span>${esc(i.source)}</span><span>${ago(i.date)}</span>${i.kind === "Paper" ? '<span class="pill">Paper</span>' : ""}${isNew(i, data) ? '<span class="pill new">New</span>' : ""}${youScore(i) >= 2 ? '<span class="pill you">For you</span>' : ""}</div>`;
+  return `<div class="meta"><span class="cat" style="--c:${color(i.category)}">${esc(c?.label || "")}</span><span>${esc(i.source)}</span><span>${ago(i.date)}</span>${i.kind === "Paper" ? '<span class="pill">Paper</span>' : ""}${isNew(i, data) ? '<span class="pill new">New</span>' : ""}</div>`;
 }
 const tile = (i) => `<a class="tile" href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener">${pic(i)}${meta(i)}<h3>${esc(i.title)}</h3></a>`;
-function row(i) {
-  const ex = S.explained[i.id];
-  return `<article class="row"><a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener">${pic(i, 336, 230)}</a><div class="body">${meta(i)}<a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener"><h3>${esc(i.title)}</h3></a>${i.summary ? `<p>${esc(i.summary)}</p>` : ""}`
-    + (sample ? `<div class="actions"><button class="linkbtn" data-explain="${esc(i.id)}">${ex ? "Hide explanation" : "Explain and relate to our work"}</button></div>${ex ? `<div class="explain">${esc(ex)}</div>` : ""}` : "") + `</div></article>`;
-}
+const row = (i) => `<article class="row"><a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener">${pic(i, 336, 230)}</a><div class="body">${meta(i)}<a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener"><h3>${esc(i.title)}</h3></a>${i.summary ? `<p>${esc(i.summary)}</p>` : ""}${themeLine(i)}</div></article>`;
 
 /* ---------- views ---------- */
 function trending() {
-  const stop = new Set("the a an of to in on for and with from by at as is are be its it this that new how why what study after over into could may can more than about amid says says' will has have their they our your who as us u.s. year years first one two three ai using reveal reveals revealed data framework global study studies based analysis approach model models modeling modelling impact impacts effect effects change changes research scientists researchers shows show find finds found driven during under across between toward towards through while when where which there these those some most other world people help helps".split(" "));
+  const stop = new Set("the a an of to in on for and with from by at as is are be its it this that new how why what study after over into could may can more than about amid says will has have their they our your who us u.s. year years first one two three ai using reveal reveals revealed data framework global study studies based analysis approach model models modeling modelling impact impacts effect effects change changes research scientists researchers shows show find finds found driven during under across between toward towards through while when where which there these those some most other world people help helps".split(" "));
   const counts = new Map();
   for (const i of NEWS.items.filter((i) => hours(i.date) < 96)) {
     const w = i.title.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter((x) => x.length > 3 && !stop.has(x));
@@ -304,180 +322,120 @@ function trending() {
   for (const [t] of top) { if (!out.some((o) => o.includes(t) || t.includes(o))) out.push(t); if (out.length >= 10) break; }
   return out;
 }
+function radar() {
+  const week = NEWS.items.filter((i) => hours(i.date) < 24 * 7);
+  return `<div class="radar">${THEMES.map((t) => {
+    const list = week.filter((i) => themesOf(i).includes(t.id));
+    const top = list.find((i) => i.kind === "News") || list[0];
+    return `<button class="rt" data-theme="${t.id}"><i style="background:${t.color}"></i><span><b>${esc(t.label)}</b><small>${top ? esc(top.title) : "Nothing new this week"}</small></span><span class="n">${list.length}</span></button>`;
+  }).join("")}</div>`;
+}
 function viewToday() {
   const items = NEWS.items;
-  const withPics = items.filter((i) => i.kind === "News" && i.summary && hours(i.date) < 72);
-  const lead = [...withPics].sort((a, b) => (youScore(b) - youScore(a)) || (!!b.image - !!a.image) || b.date.localeCompare(a.date))[0] || items[0];
-  const forYou = items.filter((i) => i !== lead && youScore(i) >= 2).sort((a, b) => youScore(b) - youScore(a) || b.date.localeCompare(a.date)).slice(0, 10);
+  const fresh = items.filter((i) => i.kind === "News" && i.summary && hours(i.date) < 72);
+  const lead = [...fresh].sort((a, b) => (myScore(b) - myScore(a)) || (!!b.image - !!a.image) || b.date.localeCompare(a.date))[0] || items[0];
   const day = items.filter((i) => hours(i.date) < 24).length;
-  const jobsWeek = JOBS.items.filter((j) => hours(j.date) < 24 * 7).length;
-  const topJobs = [...JOBS.items].sort((a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date)).slice(0, 4);
+  const topJobs = [...JOBS.items].sort((a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date)).slice(0, 5);
   let html = `<section class="lead">`;
-  if (lead) html += `<a class="story" href="${esc(safeUrl(lead.link))}" target="_blank" rel="noopener">${pic(lead, 960, 540)}${meta(lead)}<h2>${esc(lead.title)}</h2><p>${esc(lead.summary)}</p></a>`;
-  html += `<div class="side"><div class="panel"><h3>Today's briefing</h3>${briefingHtml()}</div>
-    <div class="panel"><h3>At a glance</h3><div class="glance"><div><b>${day}</b><span>stories in 24 h</span></div><div><b>${items.filter((i) => i.kind === "Paper" && hours(i.date) < 24 * 7).length}</b><span>papers this week</span></div><div><b>${jobsWeek}</b><span>new jobs this week</span></div></div>
+  if (lead) html += `<a class="story" href="${esc(safeUrl(lead.link))}" target="_blank" rel="noopener">${pic(lead, 960, 540)}${meta(lead)}<h2>${esc(lead.title)}</h2><p>${esc(lead.summary)}</p>${themeLine(lead)}</a>`;
+  html += `<div class="side"><div class="panel"><h3>Across the lab this week</h3><p class="sub">Stories and papers for each research theme in the group. Pick one to see them all.</p>${radar()}</div>
+    <div class="panel"><h3>At a glance</h3><div class="glance"><div><b>${day}</b><span>stories in 24 h</span></div><div><b>${items.filter((i) => i.kind === "Paper" && hours(i.date) < 24 * 7).length}</b><span>papers this week</span></div><div><b>${JOBS.items.filter((j) => hours(j.date) < 24 * 7).length}</b><span>new jobs this week</span></div></div>
     <h3 style="margin-top:6px">Trending</h3><div class="chips">${trending().map((t) => `<button class="chip" data-trend="${esc(t)}">${esc(t)}</button>`).join("") || '<span class="note">Not enough stories yet.</span>'}</div></div></div></section>`;
-  if (forYou.length) html += `<section><div class="sec-head"><h2>For your research</h2><span class="hint">Matched to your interests: ${esc(S.interests.slice(0, 5).join(", "))}${S.interests.length > 5 ? "…" : ""}</span><a class="more" href="#settings-interests" data-edit-interests>Edit interests</a></div><div class="rail">${forYou.map(tile).join("")}</div></section>`;
   html += `<div class="cat-band">`;
-  for (const c of NEWS.categories) {
-    const list = items.filter((i) => i.category === c.id && i !== lead).slice(0, 8);
+  for (const t of THEMES.filter((t) => S.mineThemes.has(t.id))) {
+    const list = items.filter((i) => i !== lead && themesOf(i).includes(t.id)).slice(0, 10);
     if (list.length < 2) continue;
-    html += `<section style="--c:${c.color}"><div class="sec-head"><h2>${esc(c.label)}</h2><span class="hint">${items.filter((i) => i.tags.includes(c.id)).length} stories</span><a class="more" href="#news" data-goto-cat="${c.id}">See all</a></div><div class="rail">${list.map(tile).join("")}</div></section>`;
+    html += `<section style="--c:${t.color}"><div class="sec-head"><h2>${esc(t.label)}</h2><span class="hint">${items.filter((i) => themesOf(i).includes(t.id)).length} stories and papers</span><a class="more" href="#news" data-goto-theme="${t.id}">See all</a></div><div class="rail">${list.map(tile).join("")}</div></section>`;
   }
-  html += `</div>`;
-  if (topJobs.length) html += `<section><div class="sec-head"><h2>Jobs that fit</h2><span class="hint">${JOBS.items.length} open positions from the AGU, Science and Chronicle job boards</span><a class="more" href="#jobs">All jobs</a></div><div class="list">${topJobs.map(jobRow).join("")}</div></section>`;
+  const wider = items.filter((i) => i !== lead && !themesOf(i).length && i.kind === "News").slice(0, 10);
+  if (wider.length) html += `<section style="--c:#64748b"><div class="sec-head"><h2>Wider field</h2><span class="hint">Geoscience, water, climate and policy news beyond the lab's themes</span><a class="more" href="#news">All news</a></div><div class="rail">${wider.map(tile).join("")}</div></section>`;
+  html += `</div><p class="note">Showing ${S.mineThemes.size} of ${THEMES.length} themes. <button class="linkbtn" data-edit-themes>Choose your themes</button></p>`;
+  if (topJobs.length) html += `<section><div class="sec-head"><h2>Jobs across the lab's fields</h2><span class="hint">${JOBS.items.length} open positions from the AGU, Science and Chronicle job boards</span><a class="more" href="#jobs">All jobs</a></div><div class="list">${topJobs.map(jobRow).join("")}</div></section>`;
   return html;
 }
-function briefingHtml() {
-  if (S.brief) return `<div class="brief">${S.brief}</div><button class="linkbtn" data-brief="refresh">Write it again</button>`;
-  if (S.briefBusy) return `<p class="sub">Claude is reading today's ${NEWS.items.filter((i) => hours(i.date) < 48).length} stories…</p>`;
-  if (sample) return `<p class="sub">A short, plain summary of what matters today for soil, water, plant and geophysics research.</p><div><button class="btn primary" data-brief="go">Write today's briefing</button></div>${S.briefErr ? `<p class="note">${esc(S.briefErr)}</p>` : ""}`;
-  const top = NEWS.items.filter((i) => i.kind === "News" && i.summary && hours(i.date) < 48).sort((a, b) => youScore(b) - youScore(a)).slice(0, 4);
-  return `<ul class="brief">${top.map((i) => `<li><a href="${esc(safeUrl(i.link))}" target="_blank" rel="noopener"><b>${esc(i.title)}</b></a></li>`).join("")}</ul><p class="note">Open The Continuum inside Claude to have Claude write a briefing.</p>`;
-}
-function filtered(kind) {
-  const q = S.q.toLowerCase();
-  return NEWS.items.filter((i) => i.kind === kind && hours(i.date) <= S.days * 24 && (!S.cat || i.tags.includes(S.cat)) && (!S.phd || youScore(i) >= 2)
-    && (!q || `${i.title} ${i.summary} ${i.source}`.toLowerCase().includes(q)));
-}
 function viewList(kind) {
+  const q = S.q.toLowerCase();
   const base = NEWS.items.filter((i) => i.kind === kind && hours(i.date) <= S.days * 24);
-  const list = filtered(kind);
-  const opts = (arr) => arr.map(([v, label, n, c]) => `<button class="opt" data-cat="${v}" aria-pressed="${(S.cat || "") === v}"><span>${c ? `<i style="background:${c}"></i>` : ""}${esc(label)}</span><span class="n">${n}</span></button>`).join("");
-  const cats = [["", "Everything", base.length], ...NEWS.categories.map((c) => [c.id, c.label, base.filter((i) => i.tags.includes(c.id)).length, c.color]).filter((x) => x[2])];
+  const list = base.filter((i) => (!S.cat || i.tags.includes(S.cat)) && (!S.theme || themesOf(i).includes(S.theme)) && (!S.mine || myScore(i) > 0)
+    && (!q || `${i.title} ${i.summary} ${i.source}`.toLowerCase().includes(q)));
+  const themeOpts = [["", "All themes", base.length], ...THEMES.map((t) => [t.id, t.label, base.filter((i) => themesOf(i).includes(t.id)).length, t.color])];
+  const catOpts = [["", "Every topic", base.length], ...NEWS.categories.map((c) => [c.id, c.label, base.filter((i) => i.tags.includes(c.id)).length, c.color]).filter((x) => x[2])];
+  const opt = (attr, cur) => ([v, label, n, c]) => `<button class="opt" data-${attr}="${v}" aria-pressed="${(cur || "") === v}"><span>${c ? `<i style="background:${c}"></i>` : ""}${esc(label)}</span><span class="n">${n}</span></button>`;
   const days = [[3, "Last 3 days"], [7, "This week"], [45, "Everything"]];
   return `<div class="layout"><aside class="filters" aria-label="Filters">
-      <div><h4>Topic</h4>${opts(cats)}</div>
+      <div><h4>Lab theme</h4>${themeOpts.map(opt("theme", S.theme)).join("")}</div>
+      <div><h4>Topic</h4>${catOpts.map(opt("cat", S.cat)).join("")}</div>
       <div><h4>When</h4>${days.map(([d, l]) => `<button class="opt" data-days="${d}" aria-pressed="${S.days === d}"><span>${l}</span></button>`).join("")}</div>
-      <div><h4>Focus</h4><button class="opt" data-phd aria-pressed="${S.phd}"><span>Matches my interests</span></button></div>
+      <div><h4>Focus</h4><button class="opt" data-mine aria-pressed="${S.mine}"><span>Only my themes</span></button></div>
     </aside>
     <div><div class="toolbar"><label class="search"><input id="q" type="search" placeholder="Search ${kind === "Paper" ? "papers" : "news"}…" value="${esc(S.q)}" aria-label="Search"></label><span class="count">${list.length} ${kind === "Paper" ? "papers" : "stories"}</span></div>
-    <div class="list">${list.slice(0, 120).map(row).join("") || '<p class="empty">Nothing matches. Try another topic or a wider time range.</p>'}</div></div></div>`;
+    <div class="list">${list.slice(0, 120).map(row).join("") || '<p class="empty">Nothing matches. Try another theme or a wider time range.</p>'}</div></div></div>`;
 }
 
 /* jobs */
 const JOB_TYPES = ["All", "PhD & MS", "Postdoc", "Faculty", "Research staff", "Government", "Other"];
-const jobFit = (j) => j.match + interestHits(`${j.title} ${j.summary} ${j.employer}`) * 2;
+const jobFit = (j) => themesOf(j).length + myScore(j) + (j.match || 0) / 2;
 const initials = (s) => (s || "?").replace(/\b(of|the|and|at|for)\b/gi, "").trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
 const hue = (s) => { let h = 0; for (const c of s || "") h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
 function jobRow(j) {
-  const fit = Math.min(5, Math.round(jobFit(j) / 1.5));
+  const fit = Math.min(5, Math.round(jobFit(j)));
   return `<article class="job"><div class="mark" style="background:hsl(${hue(j.employer)} 45% 38%)" aria-hidden="true">${esc(initials(j.employer))}</div>
     <div><a href="${esc(safeUrl(j.link))}" target="_blank" rel="noopener"><h3>${esc(j.title)}</h3></a><div class="who">${esc(j.employer)}${j.location ? ` · ${esc(j.location)}` : ""}</div>
     <div class="meta"><span class="pill">${esc(j.type)}</span>${j.salary ? `<span>${esc(j.salary)}</span>` : ""}<span>Posted ${ago(j.date)}</span><span>${esc(j.board)}</span>${isNew(j, JOBS) ? '<span class="pill new">New</span>' : ""}</div>
-    ${j.summary ? `<p>${esc(j.summary)}</p>` : ""}</div>
+    ${j.summary ? `<p>${esc(j.summary)}</p>` : ""}${themeLine(j)}</div>
     <div class="right"><button class="save" data-save="${esc(j.id)}" aria-pressed="${S.saved.has(j.id)}" aria-label="Save this job">${S.saved.has(j.id) ? "★" : "☆"}</button>
-    <div class="fit" title="How well it fits your interests">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= fit ? "on" : ""}"></i>`).join("")}</div></div></article>`;
+    <div class="fit" title="How many lab themes it matches">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= fit ? "on" : ""}"></i>`).join("")}</div></div></article>`;
 }
 function elsewhere() {
-  const q = S.jq || "hydrogeology";
+  const q = S.jq || "hydrogeophysics";
   const e = encodeURIComponent(q);
   const links = [["LinkedIn", `https://www.linkedin.com/jobs/search/?keywords=${e}`], ["Indeed", `https://www.indeed.com/jobs?q=${e}`],
-    ["Handshake (UToledo login)", `https://app.joinhandshake.com/stu/postings?query=${e}`], ["USAJOBS", `https://www.usajobs.gov/search/results/?k=${e}`],
+    ["Handshake", `https://app.joinhandshake.com/stu/postings?query=${e}`], ["USAJOBS", `https://www.usajobs.gov/search/results/?k=${e}`],
     ["Google Jobs", `https://www.google.com/search?q=${encodeURIComponent(q + " jobs")}&ibp=htl;jobs`], ["HigherEdJobs", `https://www.higheredjobs.com/search/advanced_action.cfm?Keyword=${e}`]];
   return `<div class="panel elsewhere"><h3>Search “${esc(q)}” on other job sites</h3><p class="sub">LinkedIn, Indeed and Handshake don't allow other sites to collect their listings, so these open the same search there.</p><div class="links">${links.map(([n, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join("")}</div></div>`;
 }
 function viewJobs() {
   const q = S.jq.toLowerCase();
-  let list = JOBS.items.filter((j) => (S.jtype === "All" || j.type === S.jtype) && (!S.savedOnly || S.saved.has(j.id)) && (!q || `${j.title} ${j.employer} ${j.location} ${j.summary}`.toLowerCase().includes(q)));
+  let list = JOBS.items.filter((j) => (S.jtype === "All" || j.type === S.jtype) && (!S.theme || themesOf(j).includes(S.theme)) && (!S.savedOnly || S.saved.has(j.id)) && (!q || `${j.title} ${j.employer} ${j.location} ${j.summary}`.toLowerCase().includes(q)));
   list = list.sort(S.jsort === "fit" ? (a, b) => jobFit(b) - jobFit(a) || b.date.localeCompare(a.date) : (a, b) => b.date.localeCompare(a.date));
   const n = (t) => (t === "All" ? JOBS.items.length : JOBS.items.filter((j) => j.type === t).length);
   return `<div class="layout"><aside class="filters" aria-label="Job filters">
       <div><h4>Position</h4>${JOB_TYPES.map((t) => `<button class="opt" data-jtype="${esc(t)}" aria-pressed="${S.jtype === t}"><span>${esc(t)}</span><span class="n">${n(t)}</span></button>`).join("")}</div>
+      <div><h4>Lab theme</h4><button class="opt" data-theme="" aria-pressed="${!S.theme}"><span>All themes</span></button>${THEMES.map((t) => `<button class="opt" data-theme="${t.id}" aria-pressed="${S.theme === t.id}"><span><i style="background:${t.color}"></i>${esc(t.label)}</span><span class="n">${JOBS.items.filter((j) => themesOf(j).includes(t.id)).length}</span></button>`).join("")}</div>
       <div><h4>Sort</h4><button class="opt" data-jsort="fit" aria-pressed="${S.jsort === "fit"}"><span>Best fit first</span></button><button class="opt" data-jsort="new" aria-pressed="${S.jsort === "new"}"><span>Newest first</span></button></div>
       <div><h4>Saved</h4><button class="opt" data-saved aria-pressed="${S.savedOnly}"><span>Only saved jobs</span><span class="n">${S.saved.size}</span></button></div>
     </aside><div>
     <div class="toolbar"><label class="search"><input id="jq" type="search" placeholder="Search jobs: hydrogeologist, postdoc, Ohio…" value="${esc(S.jq)}" aria-label="Search jobs"></label><span class="count">${list.length} jobs</span></div>
     ${elsewhere()}
-    <div class="list">${list.slice(0, 150).map(jobRow).join("") || '<p class="empty">No jobs match. Try another search or position type.</p>'}</div></div></div>`;
+    <div class="list">${list.slice(0, 150).map(jobRow).join("") || '<p class="empty">No jobs match. Try another search, theme or position type.</p>'}</div></div></div>`;
 }
 
-/* ask */
-const chat = [];
-function viewAsk() {
-  if (!sample) return `<section class="ask"><div class="sec-head"><h2>Ask the desk</h2></div><p class="note">Asking Claude about the news and jobs works when this page is opened inside Claude (the claude.ai copy of The Continuum). Here you can search the News, Papers and Jobs tabs.</p></section>`;
-  return `<section class="ask"><div class="sec-head"><h2>Ask the desk</h2><span class="hint">Claude reads this week's stories, papers and jobs to answer. Each question uses your own Claude account.</span></div>
-    <div class="chips">${["What's new on tree water use and sap flow?", "Any recent papers using electrical resistivity or IP on plants or soils?", "Which postdocs fit hydrogeophysics?", "Summarise the COP31 outcome in three points"].map((s) => `<button class="chip" data-suggest="${esc(s)}">${esc(s)}</button>`).join("")}</div>
-    <div class="msgs" id="msgs">${chat.map((m) => `<div class="msg ${m.role === "user" ? "me" : "ai"}">${esc(m.content)}</div>`).join("")}</div>
-    <form id="askform"><textarea id="askbox" placeholder="Ask about the news, papers or jobs…" aria-label="Your question"></textarea><button class="btn primary" type="submit">Ask</button></form></section>`;
-}
-function searchData(query, kind) {
-  const words = String(query || "").toLowerCase().split(/\s+/).filter((w) => w.length > 2);
-  const score = (t) => words.reduce((s, w) => s + (t.toLowerCase().includes(w) ? 1 : 0), 0);
-  if (kind === "jobs") return JOBS.items.map((j) => [score(`${j.title} ${j.employer} ${j.summary} ${j.location} ${j.type}`), j]).filter(([s]) => s).sort((a, b) => b[0] - a[0]).slice(0, 12)
-    .map(([, j]) => ({ title: j.title, employer: j.employer, location: j.location, type: j.type, posted: j.date.slice(0, 10), link: j.link }));
-  return NEWS.items.map((i) => [score(`${i.title} ${i.summary} ${i.source}`), i]).filter(([s]) => s).sort((a, b) => b[0] - a[0]).slice(0, 12)
-    .map(([, i]) => ({ title: i.title, kind: i.kind, source: i.source, date: i.date.slice(0, 10), summary: (i.summary || "").slice(0, 300), link: i.link }));
-}
-const RULES = "You answer questions for a university research group (hydro-biogeochemistry and electrical geophysics: ERT, induced polarization and self-potential on soils and trees; ecohydrology; machine learning) about the news, research papers and job openings collected on their news page. Use the search tools to find items; answer briefly in plain text, name the source and date of each item you mention, and say when nothing relevant was found. Do not invent items or links.";
-async function ask(text) {
-  chat.push({ role: "user", content: text }, { role: "assistant", content: "Thinking…" });
-  render();
-  const bubble = () => [...document.querySelectorAll("#msgs .msg.ai")].pop();
-  const turns = chat.slice(0, -1).slice(-9);
-  const tools = sampleTools ? [
-    { name: "search_news", description: "Search the collected news stories and research papers by keywords. Returns up to 12 items with title, kind, source, date, summary and link.", inputSchema: { type: "object", properties: { query: { type: "string" } }, required: ["query"] }, execute: ({ query }) => searchData(query, "news") },
-    { name: "search_jobs", description: "Search the collected job openings by keywords. Returns up to 12 jobs with title, employer, location, type, posted date and link.", inputSchema: { type: "object", properties: { query: { type: "string" } }, required: ["query"] }, execute: ({ query }) => searchData(query, "jobs") },
-  ] : undefined;
-  const context = sampleTools ? "" : `\n\nRecent items:\n${NEWS.items.slice(0, 60).map((i) => `- ${i.title} (${i.source}, ${i.date.slice(0, 10)})`).join("\n")}\n\nJobs:\n${JOBS.items.slice(0, 40).map((j) => `- ${j.title}, ${j.employer} (${j.type})`).join("\n")}`;
-  try {
-    const { text: answer } = await sample([{ role: "user", content: RULES + context }, ...turns], { cache: false, tools, onText: ({ text: t }) => { chat[chat.length - 1].content = t; const b = bubble(); if (b) b.textContent = t; } });
-    chat[chat.length - 1].content = answer;
-  } catch (e) {
-    chat[chat.length - 1].content = e.text || errorText(e);
-    if (e.code === "not_granted" || e.code === "sampling_disabled") sample = null;
-  }
-  render();
-}
-const errorText = (e) => ({ not_granted: "Claude isn't allowed on this page for you. You can still browse everything.", rate_limited: "Too many questions at once. Try again in a minute.", session_expired: "Please sign in to Claude again." }[e.code] || "That didn't work. Try again in a moment.");
-
-async function writeBriefing(refresh) {
-  S.briefBusy = true; S.briefErr = ""; render();
-  const day = new Date().toISOString().slice(0, 10);
-  const items = NEWS.items.filter((i) => hours(i.date) < 48).slice(0, 70).map((i) => `- [${CAT[i.category]?.label}] ${i.title} (${i.source}${i.kind === "Paper" ? ", paper" : ""}): ${(i.summary || "").slice(0, 180)}`).join("\n");
-  const prompt = `Write today's (${day}) briefing for a university group working on soil, root, stem and atmosphere processes with electrical geophysics (ERT, IP, SP), hydrology, ecohydrology and machine learning. Use only these items. Give: one opening sentence on the day, then 4 to 6 bullet points, each naming the story and why it matters to this group in one plain sentence. Format: the opening sentence on its own line, then lines starting with "- ". No headings, no markdown other than the dashes.\n\n${items}`;
-  try {
-    const { text } = await sample(prompt, { modelTier: "default", cache: { gcTime: 6 * 3600 * 1000, refresh: !!refresh } });
-    const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
-    const intro = lines.filter((l) => !l.startsWith("-")).slice(0, 1).map((l) => `<p>${esc(l)}</p>`).join("");
-    S.brief = intro + `<ul>${lines.filter((l) => l.startsWith("-")).map((l) => `<li>${esc(l.replace(/^-\s*/, ""))}</li>`).join("")}</ul>`;
-  } catch (e) { S.briefErr = errorText(e); if (e.code === "not_granted") sample = null; }
-  S.briefBusy = false; render();
-}
-async function explain(id) {
-  if (S.explained[id]) { delete S.explained[id]; render(); return; }
-  const i = NEWS.items.find((x) => x.id === id); if (!i) return;
-  S.explained[id] = "Thinking…"; render();
-  try {
-    const { text } = await sample(`In 3 short plain sentences: what this ${i.kind === "Paper" ? "paper" : "story"} found, and how it could matter to research on soil-root-stem-atmosphere water and biogeochemistry using electrical geophysics (ERT, IP, SP) and machine learning. If it does not relate, say so in one sentence.\n\nTitle: ${i.title}\nSource: ${i.source}\nSummary: ${i.summary || "(no summary in the feed)"}`, { modelTier: "quick", cache: { gcTime: 24 * 3600 * 1000 } });
-    S.explained[id] = text;
-  } catch (e) { S.explained[id] = errorText(e); }
-  render();
-}
-
-/* ---------- interests ---------- */
-function editInterests() {
-  const box = document.createElement("div");
-  box.className = "panel"; box.style.cssText = "position:fixed;z-index:20;left:50%;top:20%;transform:translateX(-50%);width:min(520px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.25)";
-  box.innerHTML = `<h3>Your interests</h3><p class="sub">Stories and jobs mentioning these get “For you” and rank first. One per line. Saved in this browser only.</p><textarea id="intbox" rows="8" style="width:100%;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;padding:10px">${esc(S.interests.join("\n"))}</textarea><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" data-int="cancel">Cancel</button><button class="btn primary" data-int="save">Save</button></div>`;
-  document.body.append(box);
+/* ---------- choose themes ---------- */
+function editThemes() {
+  const back = document.createElement("div"); back.className = "modal-back";
+  const box = document.createElement("div"); box.className = "panel modal"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Choose your themes");
+  box.innerHTML = `<h3>Your themes</h3><p class="sub">Today shows a row for each theme you pick, and “Only my themes” filters to them. Saved in this browser only.</p>
+    ${THEMES.map((t) => `<label><input type="checkbox" value="${t.id}" ${S.mineThemes.has(t.id) ? "checked" : ""}><i class="theme-dot" style="background:${t.color}"></i>${esc(t.label)}</label>`).join("")}
+    <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" data-m="cancel">Cancel</button><button class="btn primary" data-m="save">Save</button></div>`;
+  document.body.append(back, box);
+  const close = () => { back.remove(); box.remove(); };
+  back.addEventListener("click", close);
   box.addEventListener("click", (e) => {
-    const b = e.target.closest("[data-int]"); if (!b) return;
-    if (b.dataset.int === "save") { S.interests = $("#intbox", box).value.split("\n").map((s) => s.trim()).filter(Boolean); store.set("interests", S.interests); }
-    box.remove(); render();
+    const b = e.target.closest("[data-m]"); if (!b) return;
+    if (b.dataset.m === "save") { S.mineThemes = new Set([...box.querySelectorAll("input:checked")].map((x) => x.value)); store.set("themes", [...S.mineThemes]); }
+    close(); render();
   });
 }
 
 /* ---------- render + routing ---------- */
-const route = () => (["today", "news", "papers", "jobs", "ask"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
+const route = () => (["today", "news", "papers", "jobs"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "today");
 function render() {
   const r = route(), view = $("#view");
   const keep = document.activeElement?.id, pos = document.activeElement?.selectionStart;
   document.querySelectorAll("nav.tabs a").forEach((a) => a.setAttribute("aria-current", a.getAttribute("href") === `#${r}` ? "page" : "false"));
-  view.innerHTML = !NEWS.items.length && r !== "jobs" ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : r === "ask" ? viewAsk() : viewToday();
+  view.innerHTML = !NEWS.items.length && r !== "jobs" ? '<p class="empty">No stories collected yet.</p>' : r === "news" ? viewList("News") : r === "papers" ? viewList("Paper") : r === "jobs" ? viewJobs() : viewToday();
   paint(view);
   if (keep && document.getElementById(keep)) { const el = document.getElementById(keep); el.focus(); if (pos != null && el.setSelectionRange) el.setSelectionRange(pos, pos); }
-  const m = $("#msgs"); if (m) m.lastElementChild?.scrollIntoView({ block: "nearest" });
 }
 function ticker() {
   const top = NEWS.items.filter((i) => i.kind === "News").slice(0, 26);
@@ -486,7 +444,8 @@ function ticker() {
 }
 function footer() {
   const ok = (NEWS.sources || []).filter((s) => s.ok).length;
-  $("#foot").innerHTML = `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; a drawing stands in where a story has none or it cannot be shown here.</div>`
+  $("#foot").innerHTML = `<div>An informal news desk for members of the Hydro- &amp; Environmental Geophysics Lab (HEG-Lab), Department of Environmental Sciences, University of Toledo. Not an official university page.</div>`
+    + `<div>Updated ${NEWS.updated ? new Date(NEWS.updated).toLocaleString(undefined, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) : "—"} from ${ok} public news feeds and ${(JOBS.sources || []).filter((s) => s.ok).length} job boards, twice a day. Summaries are the opening lines of each source's own article; follow the link for the full story. Pictures belong to their publishers; a drawing stands in where a story has none.</div>`
     + `<details><summary>Sources</summary><ul>${[...(NEWS.sources || []), ...(JOBS.sources || [])].map((s) => `<li>${esc(s.source)} ${s.ok ? `· ${s.count}` : "· unavailable"}</li>`).join("")}</ul></details>`;
 }
 
@@ -494,26 +453,20 @@ document.addEventListener("click", (e) => {
   const t = e.target.closest("button, a"); if (!t) return;
   const d = t.dataset;
   if (d.cat !== undefined && t.classList.contains("opt")) { S.cat = d.cat || null; render(); }
+  else if (d.theme !== undefined) { S.theme = d.theme || null; if (t.classList.contains("rt")) location.hash = "#news"; else render(); }
   else if (d.days) { S.days = +d.days; render(); }
-  else if (d.phd !== undefined) { S.phd = !S.phd; render(); }
-  else if (d.trend) { S.q = d.trend; location.hash = "#news"; }
-  else if (d.gotoCat) { S.cat = d.gotoCat; }
-  else if (d.editInterests !== undefined) { e.preventDefault(); editInterests(); }
+  else if (d.mine !== undefined) { S.mine = !S.mine; render(); }
+  else if (d.trend) { S.q = d.trend; S.theme = null; location.hash = "#news"; }
+  else if (d.gotoTheme) { S.theme = d.gotoTheme; S.cat = null; }
+  else if (d.editThemes !== undefined) editThemes();
   else if (d.jtype) { S.jtype = d.jtype; render(); }
   else if (d.jsort) { S.jsort = d.jsort; render(); }
   else if (d.saved !== undefined) { S.savedOnly = !S.savedOnly; render(); }
   else if (d.save) { S.saved.has(d.save) ? S.saved.delete(d.save) : S.saved.add(d.save); store.set("saved", [...S.saved]); render(); }
-  else if (d.explain) explain(d.explain);
-  else if (d.brief) writeBriefing(d.brief === "refresh");
-  else if (d.suggest) ask(d.suggest);
 });
 document.addEventListener("input", (e) => {
   if (e.target.id === "q") { S.q = e.target.value; clearTimeout(S.t); S.t = setTimeout(render, 160); }
   if (e.target.id === "jq") { S.jq = e.target.value; clearTimeout(S.t); S.t = setTimeout(render, 160); }
-});
-document.addEventListener("submit", (e) => {
-  if (e.target.id !== "askform") return;
-  e.preventDefault(); const v = $("#askbox").value.trim(); if (v) ask(v);
 });
 window.addEventListener("hashchange", () => { render(); window.scrollTo({ top: 0 }); });
 
@@ -522,10 +475,6 @@ async function boot() {
   JOBS = embedded("jobs-data") || await fetch("jobs.json").then((r) => r.json()).catch(() => JOBS);
   CAT = Object.fromEntries((NEWS.categories || []).map((c) => [c.id, c]));
   ticker(); footer(); render();
-  if (window.claude?.use) {
-    const s = await window.claude.use("sample").catch(() => null);
-    if (s) { sample = s; sampleTools = !!(await s.limits().catch(() => null))?.tools; render(); }
-  }
 }
 boot();
 })();

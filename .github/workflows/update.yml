@@ -29,7 +29,7 @@ jobs:
           curl -fsSL "$base/news.json" -o site/news.json || rm -f site/news.json
           curl -fsSL "$base/jobs.json" -o site/jobs.json || rm -f site/jobs.json
       - name: Collect news, papers and jobs
-        run: python collector/news_collector.py site
+        run: python collector/news_collector.py site collector/heg_site.html
       - name: Prepare the site
         run: rm -rf site/publish && touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3

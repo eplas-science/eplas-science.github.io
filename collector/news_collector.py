@@ -370,7 +370,7 @@ def norm(title):
     return re.sub(r"[^a-z0-9]+", " ", title.lower()).strip()
 
 
-def main(out_dir):
+def main(out_dir, template=None):
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     store = out / "news.json"
@@ -417,7 +417,7 @@ def main(out_dir):
             "sources": sorted(status, key=lambda s: s["source"]), "items": keep}
     store.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
     jobs = collect_jobs(out, now)
-    page = Path(__file__).with_name("news_site.html").read_text(encoding="utf-8")
+    page = Path(template or Path(__file__).with_name("news_site.html")).read_text(encoding="utf-8")
     embed = lambda d: json.dumps(d, ensure_ascii=False).replace("<", "\\u003c")
     (out / "index.html").write_text('<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">\n' + page.replace("/*__NEWS_DATA__*/null", embed(data)).replace("/*__JOBS_DATA__*/null", embed(jobs)), encoding="utf-8")
     pub = out / "publish"  # the shared online page reads its data from these files
@@ -430,4 +430,4 @@ def main(out_dir):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1] if len(sys.argv) > 1 else ".")
+    main(sys.argv[1] if len(sys.argv) > 1 else ".", sys.argv[2] if len(sys.argv) > 2 else None)
