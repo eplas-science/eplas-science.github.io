@@ -195,6 +195,8 @@
 .rung, .start, .meet-mini, .branch, .tba a, .skill, .bchip, .opt, .save, .btn { transition: background-color .15s, border-color .15s, box-shadow .15s, color .15s; }
 /* Narrow screens: each filter group becomes one row of pills that scrolls sideways, so results show at once. */
 @media (max-width: 900px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .layout > * { min-width: 0; }
   .filters { flex-direction: column; flex-wrap: nowrap; gap: 8px; margin-bottom: 6px; }
   .filters > div { flex: none; display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 1px 1px 3px; }
   .filters > div::-webkit-scrollbar { display: none; }
