@@ -62,6 +62,9 @@ index.write_text(page, encoding="utf-8")
 for name in ("og-image.png", "conferences.json"):
     if (here / name).exists():
         shutil.copy(here / name, site / name)
+# Organiser logos for the conference pages (fetched once by fetch_logos.py).
+if (here / "logos").exists():
+    shutil.copytree(here / "logos", site / "logos", dirs_exist_ok=True)
 # Search-engine ownership files (e.g. googleXXXX.html, BingSiteAuth.xml) kept in collector/verify/.
 for proof in (here / "verify").glob("*") if (here / "verify").exists() else []:
     shutil.copy(proof, site / proof.name)

@@ -386,6 +386,66 @@ footer ul { columns: 3 200px; margin: 8px 0 0; padding-left: 18px; }
   .job { grid-template-columns: 36px minmax(0, 1fr); gap: 12px; }
   .job .mark { width: 36px; height: 36px; font-size: 12.5px; }
 }
+/* ---- conferences & rooms, light version ---- */
+.logo { position: relative; flex: none; width: 48px; height: 48px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px var(--line); display: grid; place-items: center; overflow: hidden; }
+.logo img { position: relative; z-index: 1; width: 74%; height: 74%; object-fit: contain; }
+.logo em { position: absolute; font: 600 12px var(--display); font-style: normal; color: var(--muted); letter-spacing: .02em; }
+.logo img + em { display: none; }
+.logo.sm { width: 36px; height: 36px; border-radius: 9px; }
+.logo.sm em { font-size: 10px; }
+.logo.lg { width: 60px; height: 60px; border-radius: 14px; }
+.meet-next { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 16px 18px; margin-bottom: 8px; border-radius: 14px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); border: 0; }
+.meet-next .nx small { font: 500 10.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.meet-next h2 { margin: 2px 0 4px; font: 600 19px/1.25 var(--display); }
+.meet-next h2 a { color: var(--ink); text-decoration: none; }
+.meet-next h2 a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.meet-next p { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13.5px; color: var(--muted); }
+.meet-next .count { text-align: center; padding-left: 16px; border-left: 1px solid var(--line); }
+.meet-next .count b { display: block; font: 600 26px/1 var(--display); color: var(--ink); }
+.meet-next .count small { font-size: 11.5px; color: var(--faint); }
+.mi { display: inline-flex; align-items: center; gap: 5px; }
+.mi .ic { color: var(--faint); }
+.month > h3 { font: 500 11px var(--mono); letter-spacing: .1em; color: var(--faint); margin: 26px 0 2px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+.meet { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.mtop { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.mbody h3 { margin: 0; font: 600 16.5px/1.3 var(--display); }
+.mbody h3 a:hover { color: var(--accent); }
+.mbody .who { color: var(--muted); font-size: 13px; margin: 1px 0 6px; }
+.mbody .meta { gap: 4px 14px; font-size: 13px; }
+.soon { white-space: nowrap; font-size: 12.5px; font-weight: 500; }
+.mfoot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; margin-top: 10px; }
+.fdots { margin: 0; gap: 4px 10px; }
+.fdot { font-size: 11.5px; }
+.fdot i { width: 6px; height: 6px; }
+.fdot.all { color: var(--faint); }
+.mlinks { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.mlinks a, .mlinks button { display: inline-flex; align-items: center; gap: 5px; border: 0; background: none; padding: 0; font: inherit; font-size: 13px; font-weight: 500; color: var(--accent); cursor: pointer; text-decoration: none; }
+.mlinks a:hover, .mlinks button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.tba a { flex-direction: row; align-items: center; gap: 10px; border: 0; box-shadow: inset 0 0 0 1px var(--line); background: var(--surface); }
+.mm { display: flex; flex-direction: column; min-width: 0; }
+.mm b { font: 600 14px/1.3 var(--display); }
+.mm small { font-size: 12px; color: var(--muted); }
+.meet-strip { gap: 8px; }
+.meet-mini { flex-direction: row; align-items: center; gap: 10px; padding: 10px 12px; border: 0; border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.meet-mini .mm { flex: 1; }
+.meet-mini .mm b { font-size: 15px; }
+.meet-mini:hover { box-shadow: inset 0 0 0 1px var(--faint); }
+.rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0 28px; padding: 4px 18px; border-radius: 14px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.room { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; color: var(--ink); }
+.room:hover { background: none; }
+.room:hover b { color: var(--c); }
+.rico { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: var(--c); background: color-mix(in srgb, var(--c) 10%, var(--surface)); }
+.room .rt { display: flex; flex-direction: column; min-width: 0; }
+.room .rt b { font: 600 14.5px/1.3 var(--display); color: var(--ink); }
+.room .rt small { font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.room .rn { font: 400 12px var(--mono); color: var(--faint); }
+@media (max-width: 560px) {
+  .meet-next { grid-template-columns: auto minmax(0, 1fr); }
+  .meet-next .count { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 6px; padding: 10px 0 0; border-left: 0; border-top: 1px solid var(--line); text-align: left; }
+  .meet-next .count b { font-size: 18px; }
+  .meet { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; }
+  .meet .logo { width: 40px; height: 40px; }
+}
 </style>
 
 <header class="top"><div class="wrap">
@@ -683,8 +743,13 @@ function when(m) {
   const days = Math.round((utc(m.start) - utc(t)) / DAY);
   return `<span class="soon">${days === 1 ? "tomorrow" : days < 60 ? `in ${days} days` : `in ${Math.round(days / 30.4)} months`}</span>`;
 }
+function logo(m, size = "") {
+  const fallback = esc((m.short || m.name).replace(/\s*\d{2,4}$/, "").replace(/\(.*\)/, "").trim().slice(0, 5));
+  return `<span class="logo ${size}">${m.logo ? `<img src="logos/${esc(m.logo)}.png" alt="" loading="lazy" onerror="this.remove()">` : ""}<em>${fallback}</em></span>`;
+}
+const yr = (m) => fmt(m.start, { year: "numeric" });
 function meetMini(m) {
-  return `<a class="meet-mini" href="#conferences" style="--c:${FAM[m.fields[0]]?.color || "#0f766e"}"><b>${esc(m.short)}</b><span>${esc(dateSpan(m))} ${fmt(m.start, { year: "numeric" })}</span><small>${esc(m.city)}, ${esc(m.country)}</small>${when(m)}</a>`;
+  return `<a class="meet-mini" href="#conferences">${logo(m, "sm")}<span class="mm"><b>${esc(m.short)}</b><small>${esc(dateSpan(m))} ${yr(m)} · ${esc(m.city)}</small></span>${when(m)}</a>`;
 }
 const stamp = (iso) => iso.replaceAll("-", "");
 const nextDay = (iso) => new Date(utc(iso).getTime() + DAY).toISOString().slice(0, 10);
@@ -707,17 +772,25 @@ function saveIcs(list, name) {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 const meetOk = (m, skip) => (skip === "field" || !S.mfield || m.fields.includes(S.mfield)) && (skip === "region" || S.mregion === "All" || m.region === S.mregion);
+const famLine = (ids) => (ids.length >= FAMILIES.length ? '<span class="fdot all">All fields</span>' : famDots(ids));
 function meetCard(m) {
-  const c = FAM[m.fields[0]]?.color || "#0f766e";
-  return `<article class="meet" style="--c:${c}">
-    <div class="mdate"><b>${esc(fmt(m.start, { day: "numeric" }))}${m.end !== m.start ? `<span>–${esc(fmt(m.end, m.start.slice(0, 7) === m.end.slice(0, 7) ? { day: "numeric" } : { day: "numeric", month: "short" }))}</span>` : ""}</b><small>${esc(fmt(m.start, { month: "short" }))}</small></div>
-    <div class="mbody"><h3><a href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">${esc(m.name)}</a></h3>
+  const thread = newThread("general", { title: `Going to ${m.short}?`, labels: "Conferences", body: `Who else is going to ${m.name} (${dateSpan(m)} ${yr(m)}, ${m.city})? Say hello, share your talk or poster, or plan a meet-up.` });
+  return `<article class="meet">
+    ${logo(m)}
+    <div class="mbody">
+      <div class="mtop"><h3><a href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">${esc(m.name)}</a></h3>${when(m)}</div>
       <div class="who">${esc(m.org)}</div>
-      <div class="meta"><span class="where">${ic("pin", 14)}${esc(where(m))}</span>${m.format ? `<span class="pill soft">${esc(m.format)}</span>` : ""}${when(m)}${m.check ? '<span class="pill warn" title="These dates come from event listings or were announced as tentative. Confirm on the meeting website.">Check dates</span>' : ""}</div>
+      <div class="meta"><span class="mi">${ic("cal", 14)}${esc(dateSpan(m))} ${yr(m)}</span><span class="mi">${ic("pin", 14)}${esc(where(m))}</span>${m.format ? `<span class="pill soft">${esc(m.format)}</span>` : ""}${m.check ? '<span class="pill warn" title="These dates come from event listings or were announced as tentative. Confirm on the meeting website.">Check dates</span>' : ""}</div>
       ${m.note ? `<p class="mnote">${esc(m.note)}</p>` : ""}
-      <div class="fdots">${famDots(m.fields)}</div>
-      <div class="mact"><a class="btn" href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">${ic("ext", 14)}Website</a><button class="btn" data-ics="${esc(m.id)}">${ic("cal", 14)}Add to calendar</button><a class="btn" href="${esc(gcal(m))}" target="_blank" rel="noopener">${ic("cal", 14)}Google Calendar</a><a class="btn" href="${esc(newThread("general", { title: `Going to ${m.short}?`, labels: "Conferences", body: `Who else is going to ${m.name} (${dateSpan(m)} ${fmt(m.start, { year: "numeric" })}, ${m.city})? Say hello, share your talk or poster, or plan a meet-up.` }))}" target="_blank" rel="noopener">${ic("users", 14)}Going? Meet others</a></div>
+      <div class="mfoot"><div class="fdots">${famLine(m.fields)}</div>
+        <div class="mlinks"><a href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">${ic("ext", 14)}Website</a><button data-ics="${esc(m.id)}">${ic("cal", 14)}Add to calendar</button><a href="${esc(gcal(m))}" target="_blank" rel="noopener">Google Calendar</a><a href="${esc(thread)}" target="_blank" rel="noopener">${ic("users", 14)}Meet others</a></div></div>
     </div></article>`;
+}
+function nextUp(m) {
+  const t = todayISO(), days = Math.max(0, Math.round((utc(m.start) - utc(t)) / DAY)), live = m.start <= t;
+  return `<div class="meet-next">${logo(m, "lg")}<div class="nx"><small>Next up</small><h2><a href="${esc(safeUrl(m.url))}" target="_blank" rel="noopener">${esc(m.name)}</a></h2>
+    <p><span class="mi">${ic("cal", 14)}${esc(dateSpan(m))} ${yr(m)}</span><span class="mi">${ic("pin", 14)}${esc(where(m))}</span></p></div>
+    <div class="count">${live ? "<b>Now</b><small>happening</small>" : `<b>${days}</b><small>${days === 1 ? "day to go" : "days to go"}</small>`}</div></div>`;
 }
 function viewConferences() {
   const all = upcoming();
@@ -733,9 +806,9 @@ function viewConferences() {
       <div><h4>Calendar</h4><button class="opt" data-ics-all><span>Add all ${list.length} to my calendar</span></button></div>
       ${confNews ? `<div><h4>News</h4><button class="opt" data-news-cat="conferences"><span>Calls for abstracts & meeting news</span><span class="n">${confNews}</span></button></div>` : ""}
     </aside><div>
-    ${next ? `<div class="meet-next" style="--c:${FAM[next.fields[0]]?.color || "#0f766e"}"><small>Next up</small><h2>${esc(next.name)}</h2><p>${esc(dateSpan(next))} ${fmt(next.start, { year: "numeric" })} · ${esc(where(next))}</p>${when(next)}</div>` : ""}
+    ${next ? nextUp(next) : ""}
     ${months.map(([k, ms]) => `<section class="month"><h3>${esc(fmt(`${k}-01`, { month: "long", year: "numeric" }))}</h3>${ms.map(meetCard).join("")}</section>`).join("") || '<p class="empty">No upcoming meetings match. Try another field or region.</p>'}
-    ${tba.length ? `<section class="month"><h3>Dates not announced yet</h3><div class="tba">${tba.map((t) => `<a href="${esc(safeUrl(t.url))}" target="_blank" rel="noopener"><b>${esc(t.name)}</b><span>${esc(t.org)}</span><small>${esc(t.when)}</small></a>`).join("")}</div></section>` : ""}
+    ${tba.length ? `<section class="month"><h3>Dates not announced yet</h3><div class="tba">${tba.map((t) => `<a href="${esc(safeUrl(t.url))}" target="_blank" rel="noopener">${logo({ ...t, short: t.name.split(" ")[0] }, "sm")}<span class="mm"><b>${esc(t.name)}</b><small>${esc(t.org)} · ${esc(t.when)}</small></span></a>`).join("")}</div></section>` : ""}
     <p class="note">Dates checked ${MEET.checked ? esc(fmt(MEET.checked, { day: "numeric", month: "long", year: "numeric" })) : ""} against the organisers' pages. Always confirm on the meeting website before booking travel.</p>
     </div></div>`;
 }
@@ -775,7 +848,7 @@ function viewCommunity() {
       <div class="mact"><a class="btn primary" href="${esc(newThread("general"))}" target="_blank" rel="noopener">Start a discussion</a><a class="btn" href="${FORUM}" target="_blank" rel="noopener">Browse the forum</a></div>
       <p class="fine">The forum runs on GitHub Discussions. Reading is open to everyone; posting needs a free GitHub account.</p></div></div>
     <section><div class="sec-head"><h2>Start in the right place</h2></div><div class="starts">${STARTS.map((c) => `<a class="start" href="${esc(newThread(c.slug))}" target="_blank" rel="noopener"><span class="sico">${ic(c.icon, 20)}</span><b>${esc(c.name)}</b><p>${esc(c.about)}</p></a>`).join("")}</div></section>
-    <section><div class="sec-head"><h2>Rooms by field</h2><span class="hint">Every thread can carry field labels; each room lists the threads with its label</span></div><div class="rooms">${ROOMS.map((r) => `<a class="room" style="--c:${r.color}" href="${esc(roomUrl(r.label))}" target="_blank" rel="noopener"><b>${ic(r.icon, 16)}${esc(r.label)}</b><p>${esc(r.about)}</p><small>${items.filter((t) => t.labels.includes(r.label)).length} recent threads</small></a>`).join("")}</div></section>
+    <section><div class="sec-head"><h2>Rooms by field</h2><span class="hint">Every thread can carry field labels; each room lists the threads with its label</span></div><div class="rooms">${ROOMS.map((r) => { const n = items.filter((t) => t.labels.includes(r.label)).length; return `<a class="room" style="--c:${r.color}" href="${esc(roomUrl(r.label))}" target="_blank" rel="noopener"><span class="rico">${ic(r.icon, 17)}</span><span class="rt"><b>${esc(r.label)}</b><small>${esc(r.about)}</small></span><span class="rn">${n || "—"}</span></a>`; }).join("")}</div></section>
     <section><div class="sec-head"><h2>Latest threads</h2><span class="hint">${COMM.total ? `${COMM.total} in all · ` : ""}refreshed twice a day</span><a class="more" href="${FORUM}" target="_blank" rel="noopener">Open the forum</a></div>
       ${items.length ? `<div class="bchips"><button class="bchip" style="--c:#0f766e" data-cfield="" aria-pressed="${!S.cfield}">All fields</button>${ROOMS.filter((r) => items.some((t) => t.labels.includes(r.label))).map((r) => `<button class="bchip" style="--c:${r.color}" data-cfield="${esc(r.label)}" aria-pressed="${S.cfield === r.label}">${esc(r.label)}</button>`).join("")}</div>` : ""}
       ${shown.length ? `<div class="threads">${shown.map(threadRow).join("")}</div>` : `<div class="comm-empty"><b>${items.length ? "No threads in this field yet." : "The forum has just opened."}</b><p>Be the first: <a href="${esc(newThread("q-a"))}" target="_blank" rel="noopener">ask a question</a>, <a href="${esc(newThread("show-and-tell"))}" target="_blank" rel="noopener">share your work</a> or <a href="${esc(newThread("general", { title: "Hello from …", body: "Who I am, what I work on, and what I'd like to talk about:" }))}" target="_blank" rel="noopener">introduce yourself</a>.</p></div>`}
