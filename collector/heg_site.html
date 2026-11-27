@@ -1052,6 +1052,20 @@ document.addEventListener("input", (e) => {
 });
 window.addEventListener("hashchange", () => { render(); window.scrollTo({ top: 0 }); });
 
+/* Shown inside PhD OS: links that would open a new window (and calendar subscriptions) are handed to the
+   app, which opens them in the browser. Elsewhere this does nothing. */
+if (window.parent !== window) {
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest && e.target.closest("a[href]");
+    if (!a) return;
+    if (/^webcal:/i.test(a.href) || (a.target === "_blank" && /^https?:/i.test(a.href))) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.parent.postMessage({ eplasOpen: a.href }, "*");
+    }
+  }, true);
+}
+
 async function boot() {
   NEWS = embedded("news-data") || await fetch("news.json").then((r) => r.json()).catch(() => NEWS);
   JOBS = embedded("jobs-data") || await fetch("jobs.json").then((r) => r.json()).catch(() => JOBS);
